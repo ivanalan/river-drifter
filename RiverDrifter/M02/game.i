@@ -896,9 +896,20 @@ extern long double strtold (const char *restrict, char **restrict);
 # 336 "c:\\devkitpro\\devkitarm\\arm-none-eabi\\include\\stdlib.h" 3
 
 # 4 "game.c" 2
-# 25 "game.c"
+# 26 "game.c"
 
-# 25 "game.c"
+# 26 "game.c"
+typedef struct
+{
+    int row;
+    int col;
+    int height;
+    int width;
+    int active;
+    int erased;
+    int distTraveled;
+} BULLET;
+
 typedef struct
 {
     int row;
@@ -953,6 +964,7 @@ void updateBullets();
 
 PLAYER player;
 ENEMY twig[10];
+BULLET bullets[1];
 
 
 OBJ_ATTR shadowOAM[128];
@@ -968,6 +980,7 @@ void initGame()
     time = 0;
     initPlayer();
     initTwig();
+    initBullets();
 }
 void initTwig()
 {
@@ -1002,10 +1015,30 @@ void initPlayer()
     shadowOAM[0].attr2 = ((0)*32 + (0));
 }
 
+void initBullets()
+{
+    for (int i = 0; i < 1; i++)
+    {
+        bullets[i].height = 8;
+        bullets[i].width = 8;
+        bullets[i].row = 10;
+        bullets[i].col = 10;
+        bullets[i].active = 0;
+        bullets[i].erased = 0;
+        bullets[i].distTraveled = 0;
+
+
+        shadowOAM[i + 30].attr0 = bullets[i].row | (2 << 8) | (0 << 14);
+        shadowOAM[i + 30].attr1 = bullets[i].col | (0 << 14);
+        shadowOAM[i + 30].attr2 = ((0)*32 + (4));
+    }
+}
+
 void updateGame()
 {
     updatePlayer();
     updateTwig();
+    updateBullets();
 }
 
 void updatePlayer()
@@ -1024,6 +1057,12 @@ void updatePlayer()
     if ((~((*(volatile unsigned short *)0x04000130)) & ((1 << 7))) && player.row + player.height < 160 - 1)
     {
         player.row++;
+    }
+
+
+    if ((!(~(oldButtons) & ((1 << 0))) && (~buttons & ((1 << 0)))))
+    {
+        fireBullet();
     }
 
     shadowOAM[0].attr0 = player.row | (1 << 14);
@@ -1082,4 +1121,39 @@ void drawGame()
 {
     waitForVBlank();
     DMANow(3, shadowOAM, ((OBJ_ATTR *)(0x7000000)), 512);
+}
+
+void fireBullet()
+{
+    for (int i = 0; i < 1; i++)
+    {
+        if (bullets[i].active == 0)
+        {
+            bullets[i].row = player.row;
+            bullets[i].col = player.col + player.width;
+            bullets[i].active = 1;
+            bullets[i].erased = 0;
+            break;
+        }
+    }
+}
+
+void updateBullets()
+{
+    for (int i = 0; i < 1; i++)
+    {
+        if (bullets[i].active == 1)
+        {
+            shadowOAM[i + 30].attr0 = bullets[i].row | (0 << 14);
+            shadowOAM[i + 30].attr1 = bullets[i].col | (0 << 14);
+            bullets[i].col += 1;
+            bullets[i].distTraveled += 1;
+        }
+        if (bullets[i].distTraveled > 50)
+        {
+            bullets[i].active = 0;
+            bullets[i].distTraveled = 0;
+            shadowOAM[i + 30].attr0 = (2 << 8) | (0 << 14);
+        }
+    }
 }

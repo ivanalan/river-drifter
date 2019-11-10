@@ -486,61 +486,47 @@ game:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, lr}
-	ldr	r3, .L76
+	ldr	r3, .L74
 	mov	lr, pc
 	bx	r3
-	ldr	r3, .L76+4
+	ldr	r3, .L74+4
 	mov	lr, pc
 	bx	r3
-	ldr	r3, .L76+8
+	ldr	r3, .L74+8
 	ldrh	r3, [r3, #48]
 	ands	r3, r3, #2
-	beq	.L72
-	ldr	r4, .L76+12
+	beq	.L71
+	ldr	r4, .L74+12
 .L65:
-	ldr	r3, .L76+8
-	ldrh	r3, [r3, #48]
-	ands	r3, r3, #1
-	beq	.L74
+	ldr	r3, .L74+16
+	ldrh	r3, [r3]
+	tst	r3, #8
+	beq	.L66
+	ldr	r3, .L74+20
+	ldrh	r3, [r3]
+	tst	r3, #8
+	beq	.L73
 .L66:
-	ldr	r3, .L76+16
-	ldrh	r3, [r3]
-	tst	r3, #8
-	beq	.L67
-	ldr	r3, .L76+20
-	ldrh	r3, [r3]
-	tst	r3, #8
-	beq	.L75
-.L67:
 	mov	lr, pc
 	bx	r4
 	pop	{r4, lr}
 	bx	lr
-.L74:
+.L71:
 	mov	r2, #67108864
-	strh	r3, [r2, #16]	@ movhi
-	mov	lr, pc
-	bx	r4
-	mov	r2, #5
-	ldr	r3, .L76+24
-	str	r2, [r3]
-	b	.L66
-.L72:
-	mov	r2, #67108864
-	ldr	r4, .L76+12
+	ldr	r4, .L74+12
 	strh	r3, [r2, #16]	@ movhi
 	mov	lr, pc
 	bx	r4
 	mov	r2, #4
-	ldr	r3, .L76+24
+	ldr	r3, .L74+24
 	str	r2, [r3]
 	b	.L65
-.L75:
+.L73:
 	bl	goToPause
-	b	.L67
-.L77:
+	b	.L66
+.L75:
 	.align	2
-.L76:
+.L74:
 	.word	updateGame
 	.word	drawGame
 	.word	67109120
@@ -560,17 +546,17 @@ goToLose:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, lr}
-	ldr	r3, .L80
+	ldr	r3, .L78
 	mov	lr, pc
 	bx	r3
 	mov	r2, #5
-	ldr	r3, .L80+4
+	ldr	r3, .L78+4
 	pop	{r4, lr}
 	str	r2, [r3]
 	bx	lr
-.L81:
+.L79:
 	.align	2
-.L80:
+.L78:
 	.word	waitForVBlank
 	.word	state
 	.size	goToLose, .-goToLose
@@ -585,17 +571,17 @@ goToInstruct:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, lr}
-	ldr	r3, .L84
+	ldr	r3, .L82
 	mov	lr, pc
 	bx	r3
 	mov	r2, #2
-	ldr	r3, .L84+4
+	ldr	r3, .L82+4
 	pop	{r4, lr}
 	str	r2, [r3]
 	bx	lr
-.L85:
+.L83:
 	.align	2
-.L84:
+.L82:
 	.word	waitForVBlank
 	.word	state
 	.size	goToInstruct, .-goToInstruct
@@ -612,39 +598,39 @@ instruct:
 	push	{r4, r5, r6, lr}
 	mov	r2, #512
 	mov	r5, #67108864
-	ldr	r4, .L89
+	ldr	r4, .L87
 	mov	r3, #256
 	mov	r0, #3
 	strh	r2, [r5]	@ movhi
-	ldr	r1, .L89+4
+	ldr	r1, .L87+4
 	mov	r2, #83886080
 	mov	lr, pc
 	bx	r4
 	mov	r2, #4096
 	mov	r0, #3
-	ldr	r3, .L89+8
+	ldr	r3, .L87+8
 	strh	r2, [r5, #10]	@ movhi
-	ldr	r1, .L89+12
+	ldr	r1, .L87+12
 	mov	r2, #100663296
 	mov	lr, pc
 	bx	r4
 	mov	r3, #1024
 	mov	r0, #3
-	ldr	r2, .L89+16
-	ldr	r1, .L89+20
+	ldr	r2, .L87+16
+	ldr	r1, .L87+20
 	mov	lr, pc
 	bx	r4
-	ldr	r3, .L89+24
+	ldr	r3, .L87+24
 	ldrh	r3, [r3]
 	tst	r3, #8
 	popne	{r4, r5, r6, lr}
 	bne	instruct.part.0
-.L86:
+.L84:
 	pop	{r4, r5, r6, lr}
 	bx	lr
-.L90:
+.L88:
 	.align	2
-.L89:
+.L87:
 	.word	DMANow
 	.word	instructionsPal
 	.word	9424
@@ -666,75 +652,75 @@ main:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, r7, fp, lr}
-	ldr	r4, .L104
-	ldr	r3, .L104+4
+	ldr	r4, .L102
+	ldr	r3, .L102+4
 	mov	lr, pc
 	bx	r3
-	ldr	r8, .L104+8
+	ldr	r8, .L102+8
 	ldrh	r3, [r4, #48]
-	ldr	r7, .L104+12
+	ldr	r7, .L102+12
 	strh	r3, [r8]	@ movhi
-	ldr	r6, .L104+16
-	ldr	r5, .L104+20
-	ldr	fp, .L104+24
-	ldr	r10, .L104+28
-	ldr	r9, .L104+32
-.L92:
+	ldr	r6, .L102+16
+	ldr	r5, .L102+20
+	ldr	fp, .L102+24
+	ldr	r10, .L102+28
+	ldr	r9, .L102+32
+.L90:
 	ldr	r0, [r7]
 	ldr	ip, [r6]
-.L93:
+.L91:
 	strh	r3, [r5]	@ movhi
 	ldrh	r3, [r4, #48]
 	add	r0, r0, #1
 	strh	r3, [r8]	@ movhi
 	cmp	ip, #5
 	ldrls	pc, [pc, ip, asl #2]
-	b	.L93
-.L95:
-	.word	.L100
-	.word	.L99
+	b	.L91
+.L93:
 	.word	.L98
 	.word	.L97
 	.word	.L96
+	.word	.L95
 	.word	.L94
+	.word	.L92
+.L92:
+	str	r0, [r7]
+	ldr	r3, .L102+36
+	mov	lr, pc
+	bx	r3
+.L99:
+	ldrh	r3, [r8]
+	b	.L90
 .L94:
 	str	r0, [r7]
-	ldr	r3, .L104+36
+	ldr	r3, .L102+40
 	mov	lr, pc
 	bx	r3
-.L101:
-	ldrh	r3, [r8]
-	b	.L92
+	b	.L99
+.L95:
+	str	r0, [r7]
+	ldr	r3, .L102+44
+	mov	lr, pc
+	bx	r3
+	b	.L99
 .L96:
-	str	r0, [r7]
-	ldr	r3, .L104+40
-	mov	lr, pc
-	bx	r3
-	b	.L101
-.L97:
-	str	r0, [r7]
-	ldr	r3, .L104+44
-	mov	lr, pc
-	bx	r3
-	b	.L101
-.L98:
 	str	r0, [r7]
 	mov	lr, pc
 	bx	r9
-	b	.L101
-.L99:
+	b	.L99
+.L97:
 	str	r0, [r7]
 	mov	lr, pc
 	bx	r10
-	b	.L101
-.L100:
+	b	.L99
+.L98:
 	str	r0, [r7]
 	mov	lr, pc
 	bx	fp
-	b	.L101
-.L105:
+	b	.L99
+.L103:
 	.align	2
-.L104:
+.L102:
 	.word	67109120
 	.word	goToStart
 	.word	buttons

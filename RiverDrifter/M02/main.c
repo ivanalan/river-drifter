@@ -219,11 +219,11 @@ void game()
     }
 
     //lose condition
-    if (BUTTON_HELD(BUTTON_A))
-    {
-        REG_BG0HOFF = 0;
-        goToLose();
-    }
+    // if (BUTTON_HELD(BUTTON_A))
+    // {
+    //     REG_BG0HOFF = 0;
+    //     goToLose();
+    // }
 
     //pause condition
     if (BUTTON_PRESSED(BUTTON_START))

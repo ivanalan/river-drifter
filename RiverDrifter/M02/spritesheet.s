@@ -20,8 +20,8 @@ spritesheetPal:
 	.short	1008
 	.short	32672
 	.short	5391
-	.short	0
-	.short	0
+	.short	14798
+	.short	8456
 	.short	0
 	.short	0
 	.short	0
@@ -342,17 +342,17 @@ spritesheetTiles:
 	.short	8192
 	.short	0
 	.short	0
-	.short	0
-	.short	0
-	.short	0
-	.short	0
-	.short	0
-	.short	0
-	.short	0
-	.short	0
-	.short	0
-	.short	0
-	.short	0
+	.short	12288
+	.short	51
+	.short	13056
+	.short	819
+	.short	13104
+	.short	819
+	.short	13104
+	.short	819
+	.short	13104
+	.short	51
+	.short	13056
 	.short	0
 	.short	0
 	.short	0

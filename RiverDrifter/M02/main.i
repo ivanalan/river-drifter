@@ -358,15 +358,7 @@ void game()
         (*(volatile unsigned short *)0x04000010) = 0;
         goToWin();
     }
-
-
-    if ((~((*(volatile unsigned short *)0x04000130)) & ((1 << 0))))
-    {
-        (*(volatile unsigned short *)0x04000010) = 0;
-        goToLose();
-    }
-
-
+# 229 "main.c"
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3)))))
     {
         goToPause();

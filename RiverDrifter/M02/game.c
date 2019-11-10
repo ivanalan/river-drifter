@@ -18,9 +18,21 @@
 //shadowOAM [19] = Blanket
 //shadowOAM [20] = Hat
 
+//shadowOAM [30 - 34] = bullets (rocks to be thrown)
+
 //shadowOAM [80] = left end of progress bar
 //shadowOAM [81] = middle part of progress bar
 //shadowOAM [82] = right end of progress bar
+typedef struct
+{
+    int row;
+    int col;
+    int height;
+    int width;
+    int active;
+    int erased;
+    int distTraveled;
+} BULLET;
 
 typedef struct
 {
@@ -66,7 +78,7 @@ void initTwig();
 void updateTwig();
 ENEMY findRandTwig();
 void drawEnemy();
-#define BULLETCOUNT 5
+#define BULLETCOUNT 1
 #define TWIGCOUNT 10
 
 //Player bullets
@@ -76,6 +88,7 @@ void updateBullets();
 
 PLAYER player;
 ENEMY twig[TWIGCOUNT];
+BULLET bullets[BULLETCOUNT];
 
 // Shadow OAM
 OBJ_ATTR shadowOAM[128];
@@ -91,6 +104,7 @@ void initGame()
     time = 0;
     initPlayer();
     initTwig();
+    initBullets();
 }
 void initTwig()
 {
@@ -125,10 +139,30 @@ void initPlayer()
     shadowOAM[0].attr2 = ATTR2_TILEID(0, 0);
 }
 
+void initBullets()
+{
+    for (int i = 0; i < BULLETCOUNT; i++)
+    {
+        bullets[i].height = 8;
+        bullets[i].width = 8;
+        bullets[i].row = 10;
+        bullets[i].col = 10;
+        bullets[i].active = 0;
+        bullets[i].erased = 0;
+        bullets[i].distTraveled = 0;
+
+        //bullets drawn from [30, 34]
+        shadowOAM[i + 30].attr0 = bullets[i].row | ATTR0_HIDE | ATTR0_SQUARE;
+        shadowOAM[i + 30].attr1 = bullets[i].col | ATTR1_TINY;
+        shadowOAM[i + 30].attr2 = ATTR2_TILEID(4, 0);
+    }
+}
+
 void updateGame()
 {
     updatePlayer();
     updateTwig();
+    updateBullets();
 }
 
 void updatePlayer()
@@ -147,6 +181,12 @@ void updatePlayer()
     if (BUTTON_HELD(BUTTON_DOWN) && player.row + player.height < SCREENHEIGHT - 1)
     {
         player.row++;
+    }
+
+    //fire bullet
+    if (BUTTON_PRESSED(BUTTON_A))
+    {
+        fireBullet();
     }
 
     shadowOAM[0].attr0 = player.row | ATTR0_WIDE;
@@ -205,4 +245,39 @@ void drawGame()
 {
     waitForVBlank();
     DMANow(3, shadowOAM, OAM, 512);
+}
+
+void fireBullet()
+{
+    for (int i = 0; i < BULLETCOUNT; i++)
+    {
+        if (bullets[i].active == 0)
+        {
+            bullets[i].row = player.row;
+            bullets[i].col = player.col + player.width;
+            bullets[i].active = 1;
+            bullets[i].erased = 0;
+            break;
+        }
+    }
+}
+
+void updateBullets()
+{
+    for (int i = 0; i < BULLETCOUNT; i++)
+    {
+        if (bullets[i].active == 1)
+        {
+            shadowOAM[i + 30].attr0 = bullets[i].row | ATTR0_SQUARE;
+            shadowOAM[i + 30].attr1 = bullets[i].col | ATTR1_TINY;
+            bullets[i].col += 1;
+            bullets[i].distTraveled += 1;
+        }
+        if (bullets[i].distTraveled > 50)
+        {
+            bullets[i].active = 0;
+            bullets[i].distTraveled = 0;
+            shadowOAM[i + 30].attr0 = ATTR0_HIDE | ATTR0_SQUARE;
+        }
+    }
 }
