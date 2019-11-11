@@ -106,33 +106,35 @@ initGame:
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, r5, r6, lr}
 	mov	r4, #0
+	mov	lr, #40
+	mov	r5, #80
 	mov	r6, #8
-	mov	lr, #80
-	mov	r1, #16
-	mov	r2, #16384
-	mov	ip, #40
-	mov	r0, #1
+	mov	ip, #1
+	mov	r0, #16
+	mov	r1, #16384
+	mov	r2, #3
 	ldr	r3, .L14
 	strh	r4, [r3]	@ movhi
 	ldr	r3, .L14+4
-	ldr	r5, .L14+8
 	str	r4, [r3]
-	ldr	r3, .L14+12
-	strh	r2, [r5]	@ movhi
+	ldr	r3, .L14+8
+	stm	r3, {r5, lr}
+	ldr	r5, .L14+12
 	str	r4, [r3, #24]
-	str	lr, [r3]
-	str	r1, [r3, #16]
 	str	r6, [r3, #20]
-	str	ip, [r3, #4]
-	str	r0, [r3, #8]
+	str	ip, [r3, #8]
+	str	r0, [r3, #16]
+	ldr	r3, .L14+16
+	strh	r1, [r5]	@ movhi
 	strh	r4, [r5, #2]	@ movhi
 	strh	r4, [r5, #4]	@ movhi
+	str	r2, [r3]
 	bl	initTwig
 	mov	r3, #4
 	mov	r2, #10
 	strh	r3, [r5, #244]	@ movhi
-	ldr	r1, .L14+16
-	ldr	r3, .L14+20
+	ldr	r1, .L14+20
+	ldr	r3, .L14+24
 	strh	r1, [r5, #240]	@ movhi
 	strh	r2, [r5, #242]	@ movhi
 	str	r6, [r3, #8]
@@ -149,8 +151,9 @@ initGame:
 .L14:
 	.word	hOff
 	.word	time
-	.word	shadowOAM
 	.word	player
+	.word	shadowOAM
+	.word	livesremaining
 	.word	522
 	.word	bullets
 	.size	initGame, .-initGame
@@ -383,78 +386,127 @@ updateTwig:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 40
 	@ frame_needed = 0, uses_anonymous_args = 0
-	push	{r4, r5, r6, r7, r8, r9, r10, lr}
-	ldr	r4, .L54
-	mov	r9, #0
-	mov	r3, r4
-	mov	r8, #10
-	mov	r7, #240
-	mov	r6, #512
-	ldr	r2, .L54+4
-	ldr	ip, [r2]
-	ldr	r5, .L54+8
-	ldr	r2, .L54+12
-	sub	sp, sp, #40
-	and	lr, ip, #1
-	add	r0, r4, #400
-.L49:
-	ldr	r1, [r3, #36]
-	cmp	r1, #1
-	bne	.L45
-	ldr	r10, [r3, #12]
-	cmp	lr, #0
-	subeq	r10, r10, #2
-	streq	r10, [r3, #12]
-	orr	r1, r10, #16384
-	cmp	r10, #0
-	lsl	r1, r1, #16
-	movle	r1, r5
-	strle	r8, [r3, #4]
-	ldr	r10, [r3, #4]
-	lsrgt	r1, r1, #16
-	strhle	r6, [r2]	@ movhi
-	strle	r9, [r3, #36]
-	strle	r7, [r3, #12]
-	strh	r1, [r2, #2]	@ movhi
-	strh	r10, [r2]	@ movhi
+	push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+	ldr	r8, .L58
+	ldr	r5, .L58+4
+	mov	r4, r8
+	ldr	r9, .L58+8
+	ldr	r7, .L58+12
+	ldr	fp, .L58+16
+	ldr	r10, .L58+20
+	sub	sp, sp, #60
+	add	r6, r8, #400
+	b	.L51
 .L45:
-	add	r3, r3, #40
-	cmp	r3, r0
-	add	r2, r2, #8
-	bne	.L49
-	ldr	r3, .L54+16
-	ldr	r2, .L54+20
-	mla	ip, r2, ip, r3
-	ldr	r3, .L54+24
-	cmp	r3, ip, ror #2
-	bcs	.L53
-	add	sp, sp, #40
+	add	r4, r4, #40
+	cmp	r6, r4
+	add	r5, r5, #8
+	beq	.L56
+.L51:
+	ldr	r3, [r4, #36]
+	cmp	r3, #1
+	bne	.L45
+	ldm	r7, {r2, r3}
+	ldr	r0, [r7, #20]
+	ldr	r1, [r7, #16]
+	str	r2, [sp, #4]
+	str	r0, [sp, #12]
+	str	r1, [sp, #8]
+	str	r3, [sp]
+	add	r2, r4, #24
+	ldm	r2, {r2, r3}
+	ldr	r1, [r4, #4]
+	ldr	r0, [r4, #12]
+	mov	lr, pc
+	bx	fp
+	cmp	r0, #0
+	beq	.L46
+	ldr	r3, [r10]
+	sub	r3, r3, #1
+	str	r3, [r10]
+	ldr	r3, [r9]
+	tst	r3, #1
+	mov	ip, #0
+	mov	r0, #10
+	mov	r1, #240
+	mov	r2, #512
+	moveq	r3, #238
+	str	r1, [r4, #12]
+	str	ip, [r4, #36]
+	str	r0, [r4, #4]
+	strh	r2, [r5]	@ movhi
+	streq	r3, [r4, #12]
+	beq	.L48
+	ldr	r3, .L58+24
+.L47:
+	ldr	r2, [r4, #4]
+	add	r4, r4, #40
+	cmp	r6, r4
+	strh	r3, [r5, #2]	@ movhi
+	strh	r2, [r5]	@ movhi
+	add	r5, r5, #8
+	bne	.L51
+.L56:
+	ldr	r2, .L58+28
+	ldr	r3, [r9]
+	ldr	r1, .L58+32
+	mla	r3, r1, r3, r2
+	ldr	r2, .L58+36
+	cmp	r2, r3, ror #2
+	bcs	.L57
+	add	sp, sp, #60
 	@ sp needed
-	pop	{r4, r5, r6, r7, r8, r9, r10, lr}
+	pop	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
 	bx	lr
-.L53:
-	mov	r0, sp
+.L46:
+	ldr	r3, [r9]
+	tst	r3, #1
+	ldr	r3, [r4, #12]
+	subeq	r3, r3, #2
+	streq	r3, [r4, #12]
+	cmp	r3, #0
+	bgt	.L48
+	mov	r3, #512
+	mov	r0, #0
+	mov	r1, #10
+	mov	r2, #240
+	strh	r3, [r5]	@ movhi
+	str	r0, [r4, #36]
+	str	r1, [r4, #4]
+	str	r2, [r4, #12]
+	ldr	r3, .L58+24
+	b	.L47
+.L48:
+	orr	r3, r3, #16384
+	lsl	r3, r3, #16
+	lsr	r3, r3, #16
+	b	.L47
+.L57:
+	add	r0, sp, #16
 	bl	findRandTwig
 	mov	r1, #240
 	mov	r2, #1
-	ldr	r3, [sp]
-	ldr	r0, [sp, #8]
+	ldr	r3, [sp, #16]
+	ldr	r0, [sp, #24]
 	add	r3, r3, r3, lsl #2
-	add	r4, r4, r3, lsl #3
-	str	r0, [r4, #4]
-	str	r1, [r4, #12]
-	str	r2, [r4, #36]
-	add	sp, sp, #40
+	add	r8, r8, r3, lsl #3
+	str	r0, [r8, #4]
+	str	r1, [r8, #12]
+	str	r2, [r8, #36]
+	add	sp, sp, #60
 	@ sp needed
-	pop	{r4, r5, r6, r7, r8, r9, r10, lr}
+	pop	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
 	bx	lr
-.L55:
+.L59:
 	.align	2
-.L54:
+.L58:
 	.word	twig
-	.word	time
-	.word	16624
 	.word	shadowOAM+400
+	.word	time
+	.word	player
+	.word	collision
+	.word	livesremaining
+	.word	16624
 	.word	85899344
 	.word	-1030792151
 	.word	42949672
@@ -470,21 +522,21 @@ drawGame:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, lr}
-	ldr	r3, .L58
+	ldr	r3, .L62
 	mov	lr, pc
 	bx	r3
-	ldr	r4, .L58+4
+	ldr	r4, .L62+4
 	mov	r3, #512
 	mov	r2, #117440512
 	mov	r0, #3
-	ldr	r1, .L58+8
+	ldr	r1, .L62+8
 	mov	lr, pc
 	bx	r4
 	pop	{r4, lr}
 	bx	lr
-.L59:
+.L63:
 	.align	2
-.L58:
+.L62:
 	.word	waitForVBlank
 	.word	DMANow
 	.word	shadowOAM
@@ -500,14 +552,14 @@ fireBullet:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	@ link register save eliminated.
-	ldr	r3, .L62
+	ldr	r3, .L66
 	ldr	r3, [r3, #16]
 	cmp	r3, #0
 	bxne	lr
 	b	fireBullet.part.0
-.L63:
+.L67:
 	.align	2
-.L62:
+.L66:
 	.word	bullets
 	.size	fireBullet, .-fireBullet
 	.align	2
@@ -520,38 +572,92 @@ updateBullets:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	ldr	r3, .L68
-	ldr	r2, [r3, #16]
-	cmp	r2, #1
-	str	lr, [sp, #-4]!
-	ldr	r2, [r3, #24]
-	bne	.L65
-	ldr	r0, [r3, #4]
-	ldr	r1, .L68+4
-	ldr	ip, [r3]
-	add	r2, r2, #1
-	add	lr, r0, #1
-	str	r2, [r3, #24]
-	str	lr, [r3, #4]
-	strh	r0, [r1, #242]	@ movhi
-	strh	ip, [r1, #240]	@ movhi
-.L65:
-	cmp	r2, #50
-	ble	.L64
-	mov	r2, #0
-	mov	r0, #512
-	ldr	r1, .L68+4
-	str	r2, [r3, #16]
-	str	r2, [r3, #24]
-	strh	r0, [r1, #240]	@ movhi
-.L64:
-	ldr	lr, [sp], #4
-	bx	lr
+	push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+	ldr	r5, .L82
+	ldr	r3, [r5, #16]
+	cmp	r3, #1
+	sub	sp, sp, #20
+	ldr	r3, [r5, #24]
+	beq	.L80
 .L69:
-	.align	2
+	cmp	r3, #50
+	ble	.L68
+	mov	r3, #0
+	mov	r1, #512
+	ldr	r2, .L82+4
+	str	r3, [r5, #16]
+	str	r3, [r5, #24]
+	strh	r1, [r2, #240]	@ movhi
 .L68:
+	add	sp, sp, #20
+	@ sp needed
+	pop	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+	bx	lr
+.L80:
+	ldr	r2, [r5, #4]
+	ldr	r8, .L82+4
+	ldr	r1, [r5]
+	ldr	r4, .L82+8
+	add	r3, r3, #1
+	add	r0, r2, #1
+	mov	r9, #0
+	mov	fp, #10
+	str	r3, [r5, #24]
+	str	r0, [r5, #4]
+	strh	r2, [r8, #242]	@ movhi
+	strh	r1, [r8, #240]	@ movhi
+	ldr	r10, .L82+12
+	add	r6, r8, #400
+	add	r7, r4, #400
+	b	.L73
+.L71:
+	add	r4, r4, #40
+	cmp	r4, r7
+	add	r6, r6, #8
+	beq	.L81
+.L73:
+	ldr	r3, [r4, #36]
+	cmp	r3, #1
+	bne	.L71
+	ldr	r0, [r4, #28]
+	ldr	r1, [r4, #24]
+	ldr	r2, [r4, #4]
+	ldr	r3, [r4, #12]
+	str	r0, [sp, #12]
+	str	r1, [sp, #8]
+	str	r2, [sp, #4]
+	str	r3, [sp]
+	ldr	r2, [r5, #12]
+	ldr	r3, [r5, #8]
+	ldr	r1, [r5]
+	ldr	r0, [r5, #4]
+	mov	lr, pc
+	bx	r10
+	cmp	r0, #0
+	beq	.L71
+	mov	r2, #240
+	mov	r3, #512
+	str	r9, [r4, #36]
+	str	fp, [r4, #4]
+	str	r2, [r4, #12]
+	add	r4, r4, #40
+	cmp	r4, r7
+	strh	r3, [r6]	@ movhi
+	str	r9, [r5, #16]
+	str	r9, [r5, #24]
+	strh	r3, [r8, #240]	@ movhi
+	add	r6, r6, #8
+	bne	.L73
+.L81:
+	ldr	r3, [r5, #24]
+	b	.L69
+.L83:
+	.align	2
+.L82:
 	.word	bullets
 	.word	shadowOAM
+	.word	twig
+	.word	collision
 	.size	updateBullets, .-updateBullets
 	.align	2
 	.global	updateGame
@@ -574,11 +680,4 @@ updateGame:
 	.comm	bullets,28,4
 	.comm	twig,400,4
 	.comm	player,28,4
-	.global	livesremaining
-	.data
-	.align	2
-	.type	livesremaining, %object
-	.size	livesremaining, 4
-livesremaining:
-	.word	3
 	.ident	"GCC: (devkitARM release 53) 9.1.0"

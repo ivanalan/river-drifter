@@ -68,8 +68,7 @@ void drawGame();
 void initPlayer();
 void updatePlayer();
 void drawPlayer();
-#define LIVESREMAINING 3
-extern int livesremaining = 3;
+extern int livesremaining;
 void initLives();
 void updateLives(int lives);
 
@@ -102,6 +101,7 @@ void initGame()
 {
     hOff = 0;
     time = 0;
+    livesremaining = 3;
     initPlayer();
     initTwig();
     initBullets();
@@ -201,6 +201,15 @@ void updateTwig()
     {
         if (twig[i].active == 1)
         {
+            //decrease lives if collision with twig
+            if (collision(twig[i].col, twig[i].row, twig[i].width, twig[i].height, player.col, player.row, player.width, player.height))
+            {
+                livesremaining = livesremaining - 1;
+                twig[i].active = 0;
+                twig[i].row = 10;
+                twig[i].col = SCREENWIDTH;
+                shadowOAM[i + 50].attr0 = ATTR0_HIDE | ATTR0_SQUARE;
+            }
 
             if (time % 2 == 0)
             {
@@ -272,6 +281,24 @@ void updateBullets()
             shadowOAM[i + 30].attr1 = bullets[i].col | ATTR1_TINY;
             bullets[i].col += 1;
             bullets[i].distTraveled += 1;
+
+            //check if bullets hit twigs
+            for (int j = 0; j < TWIGCOUNT; j++)
+            {
+                if (twig[j].active == 1)
+                {
+                    if (collision(bullets[i].col, bullets[i].row, bullets[i].width, bullets[i].height, twig[j].col, twig[j].row, twig[j].width, twig[j].height))
+                    {
+                        twig[j].active = 0;
+                        twig[j].row = 10;
+                        twig[j].col = SCREENWIDTH;
+                        shadowOAM[j + 50].attr0 = ATTR0_HIDE | ATTR0_SQUARE;
+                        bullets[i].active = 0;
+                        bullets[i].distTraveled = 0;
+                        shadowOAM[i + 30].attr0 = ATTR0_HIDE | ATTR0_SQUARE;
+                    }
+                }
+            }
         }
         if (bullets[i].distTraveled > 50)
         {

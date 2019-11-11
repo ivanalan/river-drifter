@@ -38,6 +38,7 @@ typedef unsigned int u32;
 
 #define BG_CHARBLOCK(num) ((num) << 2)
 #define BG_SCREENBLOCK(num) ((num) << 8)
+#define BG_MOSAIC (1 << 6)
 #define BG_8BPP (1 << 7)
 #define BG_SIZE_SMALL (0 << 14) // 32x32 tiles
 #define BG_SIZE_WIDE (1 << 14)  // 64x32 tiles

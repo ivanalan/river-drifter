@@ -33,7 +33,7 @@ extern int time = 0;
 // Random Seed
 int seed;
 
-extern int livesremaining;
+int livesremaining;
 
 enum
 {
@@ -219,11 +219,11 @@ void game()
     }
 
     //lose condition
-    // if (BUTTON_HELD(BUTTON_A))
-    // {
-    //     REG_BG0HOFF = 0;
-    //     goToLose();
-    // }
+    if (livesremaining == 0)
+    {
+        REG_BG0HOFF = 0;
+        goToLose();
+    }
 
     //pause condition
     if (BUTTON_PRESSED(BUTTON_START))
