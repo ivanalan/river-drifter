@@ -7,9 +7,13 @@
 //shadowOAM [1] = digits (ex: 0,1,2,3,...)
 //shadowOAM [2] = rock to be thrown
 
-//shadowOAM [5] = "Lives: "
+//shadowOAM [4] = "Lives: "
+//shadowOAM [5] = digits (0,1,2,4 ...)
+
 //shadowOAM [6] = "Items: "
-//shadowOAM [7] = "Progress in River"
+//shadowOAM [7] = digits (ex: 0,1,2,3)
+
+//shadowOAM [8] = "Progress in River"
 
 //shadowOAM [50 - 60] = Twig
 //shadowOAM [16] = Shirt
@@ -20,9 +24,9 @@
 
 //shadowOAM [30 - 34] = bullets (rocks to be thrown)
 
-//shadowOAM [80] = left end of progress bar
-//shadowOAM [81] = middle part of progress bar
-//shadowOAM [82] = right end of progress bar
+//shadowOAM [90] = left end of progress bar
+//shadowOAM [91] = middle part of progress bar
+//shadowOAM [92] = right end of progress bar
 typedef struct
 {
     int row;
@@ -104,7 +108,21 @@ void initGame()
     livesremaining = 3;
     initPlayer();
     initTwig();
+    initLives();
     initBullets();
+}
+
+void initLives()
+{
+    //"lives: "
+    shadowOAM[4].attr0 = 4 | ATTR0_WIDE;
+    shadowOAM[4].attr1 = 2 | ATTR1_SMALL;
+    shadowOAM[4].attr2 = ATTR2_TILEID(0, 2);
+
+    //intial "3"
+    shadowOAM[5].attr0 = 4 | ATTR0_SQUARE;
+    shadowOAM[5].attr1 = 8 | ATTR1_TINY;
+    shadowOAM[5].attr2 = ATTR2_TILEID(2, 4);
 }
 void initTwig()
 {
@@ -163,6 +181,34 @@ void updateGame()
     updatePlayer();
     updateTwig();
     updateBullets();
+    updateLives(livesremaining);
+}
+
+void updateLives(int lives)
+{
+    if (lives == 2)
+    {
+        shadowOAM[5].attr0 = 4 | ATTR0_SQUARE;
+        shadowOAM[5].attr1 = 35 | ATTR1_TINY;
+        shadowOAM[5].attr2 = ATTR2_TILEID(1, 4);
+    }
+    else if (lives == 1)
+    {
+        shadowOAM[5].attr0 = 4 | ATTR0_SQUARE;
+        shadowOAM[5].attr1 = 35 | ATTR1_TINY;
+        shadowOAM[5].attr2 = ATTR2_TILEID(0, 4);
+    }
+    else
+    {
+        shadowOAM[5].attr0 = 4 | ATTR0_SQUARE;
+        shadowOAM[5].attr1 = 35 | ATTR1_TINY;
+        shadowOAM[5].attr2 = ATTR2_TILEID(2, 4);
+    }
+
+    //update lives
+    shadowOAM[4].attr0 = 4 | ATTR0_WIDE;
+    shadowOAM[4].attr1 = 2 | ATTR1_SMALL;
+    shadowOAM[4].attr2 = ATTR2_TILEID(0, 2);
 }
 
 void updatePlayer()

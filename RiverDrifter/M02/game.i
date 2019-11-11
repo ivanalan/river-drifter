@@ -896,9 +896,9 @@ extern long double strtold (const char *restrict, char **restrict);
 # 336 "c:\\devkitpro\\devkitarm\\arm-none-eabi\\include\\stdlib.h" 3
 
 # 4 "game.c" 2
-# 26 "game.c"
+# 30 "game.c"
 
-# 26 "game.c"
+# 30 "game.c"
 typedef struct
 {
     int row;
@@ -980,7 +980,21 @@ void initGame()
     livesremaining = 3;
     initPlayer();
     initTwig();
+    initLives();
     initBullets();
+}
+
+void initLives()
+{
+
+    shadowOAM[4].attr0 = 4 | (1 << 14);
+    shadowOAM[4].attr1 = 2 | (1 << 14);
+    shadowOAM[4].attr2 = ((2)*32 + (0));
+
+
+    shadowOAM[5].attr0 = 4 | (0 << 14);
+    shadowOAM[5].attr1 = 8 | (0 << 14);
+    shadowOAM[5].attr2 = ((4)*32 + (2));
 }
 void initTwig()
 {
@@ -1039,6 +1053,34 @@ void updateGame()
     updatePlayer();
     updateTwig();
     updateBullets();
+    updateLives(livesremaining);
+}
+
+void updateLives(int lives)
+{
+    if (lives == 2)
+    {
+        shadowOAM[5].attr0 = 4 | (0 << 14);
+        shadowOAM[5].attr1 = 35 | (0 << 14);
+        shadowOAM[5].attr2 = ((4)*32 + (1));
+    }
+    else if (lives == 1)
+    {
+        shadowOAM[5].attr0 = 4 | (0 << 14);
+        shadowOAM[5].attr1 = 35 | (0 << 14);
+        shadowOAM[5].attr2 = ((4)*32 + (0));
+    }
+    else
+    {
+        shadowOAM[5].attr0 = 4 | (0 << 14);
+        shadowOAM[5].attr1 = 35 | (0 << 14);
+        shadowOAM[5].attr2 = ((4)*32 + (2));
+    }
+
+
+    shadowOAM[4].attr0 = 4 | (1 << 14);
+    shadowOAM[4].attr1 = 2 | (1 << 14);
+    shadowOAM[4].attr2 = ((2)*32 + (0));
 }
 
 void updatePlayer()
