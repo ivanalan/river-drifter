@@ -175,6 +175,7 @@ extern int time = 0;
 int seed;
 
 int livesremaining;
+int itemsCollected;
 
 enum
 {

@@ -750,6 +750,7 @@ main:
 	.word	pause
 	.size	main, .-main
 	.comm	state,4,4
+	.comm	itemsCollected,4,4
 	.comm	livesremaining,4,4
 	.comm	seed,4,4
 	.global	time

@@ -72,6 +72,13 @@ void drawGame();
 void initPlayer();
 void updatePlayer();
 void drawPlayer();
+
+//items
+extern int itemsCollected;
+void initItems();
+void updateItems(int item);
+
+//lives
 extern int livesremaining;
 void initLives();
 void updateLives(int lives);
@@ -106,10 +113,25 @@ void initGame()
     hOff = 0;
     time = 0;
     livesremaining = 3;
+    itemsCollected = 0;
     initPlayer();
     initTwig();
     initLives();
     initBullets();
+    initItems();
+}
+
+void initItems()
+{
+    //"Items: "
+    shadowOAM[6].attr0 = 4 | ATTR0_WIDE;
+    shadowOAM[6].attr1 = 180 | ATTR1_SMALL;
+    shadowOAM[6].attr2 = ATTR2_TILEID(0, 3);
+
+    //intial "0"
+    shadowOAM[7].attr0 = 4 | ATTR0_SQUARE;
+    shadowOAM[7].attr1 = 215 | ATTR1_TINY;
+    shadowOAM[7].attr2 = ATTR2_TILEID(9, 4);
 }
 
 void initLives()
@@ -147,7 +169,7 @@ void initTwig()
 void initPlayer()
 {
     player.row = SCREENHEIGHT / 2;
-    player.col = (SCREENWIDTH / 2) - 80;
+    player.col = (SCREENWIDTH / 2) - 70;
     player.rdel = 1;
     player.width = 16;
     player.height = 8;
@@ -182,6 +204,7 @@ void updateGame()
     updateTwig();
     updateBullets();
     updateLives(livesremaining);
+    updateItems(itemsCollected);
 }
 
 void updateLives(int lives)
@@ -209,6 +232,29 @@ void updateLives(int lives)
     shadowOAM[4].attr0 = 4 | ATTR0_WIDE;
     shadowOAM[4].attr1 = 2 | ATTR1_SMALL;
     shadowOAM[4].attr2 = ATTR2_TILEID(0, 2);
+}
+
+void updateItems(int items)
+{
+    if (items > 0)
+    {
+        //update number
+        shadowOAM[7].attr0 = 4 | ATTR0_SQUARE;
+        shadowOAM[7].attr1 = 215 | ATTR1_TINY;
+        shadowOAM[7].attr2 = ATTR2_TILEID(items - 1, 4);
+    }
+    else
+    {
+        //intial "0"
+        shadowOAM[7].attr0 = 4 | ATTR0_SQUARE;
+        shadowOAM[7].attr1 = 215 | ATTR1_TINY;
+        shadowOAM[7].attr2 = ATTR2_TILEID(9, 4);
+    }
+
+    //update "Items: "
+    shadowOAM[6].attr0 = 4 | ATTR0_WIDE;
+    shadowOAM[6].attr1 = 180 | ATTR1_SMALL;
+    shadowOAM[6].attr2 = ATTR2_TILEID(0, 3);
 }
 
 void updatePlayer()

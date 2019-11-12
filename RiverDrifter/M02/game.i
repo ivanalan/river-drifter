@@ -944,6 +944,13 @@ void drawGame();
 void initPlayer();
 void updatePlayer();
 void drawPlayer();
+
+
+extern int itemsCollected;
+void initItems();
+void updateItems(int item);
+
+
 extern int livesremaining;
 void initLives();
 void updateLives(int lives);
@@ -978,10 +985,25 @@ void initGame()
     hOff = 0;
     time = 0;
     livesremaining = 3;
+    itemsCollected = 0;
     initPlayer();
     initTwig();
     initLives();
     initBullets();
+    initItems();
+}
+
+void initItems()
+{
+
+    shadowOAM[6].attr0 = 4 | (1 << 14);
+    shadowOAM[6].attr1 = 180 | (1 << 14);
+    shadowOAM[6].attr2 = ((3)*32 + (0));
+
+
+    shadowOAM[7].attr0 = 4 | (0 << 14);
+    shadowOAM[7].attr1 = 215 | (0 << 14);
+    shadowOAM[7].attr2 = ((4)*32 + (9));
 }
 
 void initLives()
@@ -1019,7 +1041,7 @@ void initTwig()
 void initPlayer()
 {
     player.row = 160 / 2;
-    player.col = (240 / 2) - 80;
+    player.col = (240 / 2) - 70;
     player.rdel = 1;
     player.width = 16;
     player.height = 8;
@@ -1054,6 +1076,7 @@ void updateGame()
     updateTwig();
     updateBullets();
     updateLives(livesremaining);
+    updateItems(itemsCollected);
 }
 
 void updateLives(int lives)
@@ -1083,6 +1106,29 @@ void updateLives(int lives)
     shadowOAM[4].attr2 = ((2)*32 + (0));
 }
 
+void updateItems(int items)
+{
+    if (items > 0)
+    {
+
+        shadowOAM[7].attr0 = 4 | (0 << 14);
+        shadowOAM[7].attr1 = 215 | (0 << 14);
+        shadowOAM[7].attr2 = ((4)*32 + (items - 1));
+    }
+    else
+    {
+
+        shadowOAM[7].attr0 = 4 | (0 << 14);
+        shadowOAM[7].attr1 = 215 | (0 << 14);
+        shadowOAM[7].attr2 = ((4)*32 + (9));
+    }
+
+
+    shadowOAM[6].attr0 = 4 | (1 << 14);
+    shadowOAM[6].attr1 = 180 | (1 << 14);
+    shadowOAM[6].attr2 = ((3)*32 + (0));
+}
+
 void updatePlayer()
 {
 
@@ -1093,6 +1139,7 @@ void updatePlayer()
     }
     if ((~((*(volatile unsigned short *)0x04000130)) & ((1 << 6))) && player.row > 1)
     {
+        itemsCollected++;
         player.row--;
     }
 
