@@ -896,9 +896,30 @@ extern long double strtold (const char *restrict, char **restrict);
 # 336 "c:\\devkitpro\\devkitarm\\arm-none-eabi\\include\\stdlib.h" 3
 
 # 4 "game.c" 2
-# 30 "game.c"
+# 31 "game.c"
 
-# 30 "game.c"
+# 31 "game.c"
+enum
+{
+    SHIRT,
+    SHORT,
+    BOOTS,
+    BLANKET,
+    HAT
+};
+
+typedef struct
+{
+    int id;
+    int row;
+    int initRow;
+    int col;
+    int height;
+    int width;
+    int active;
+    int type;
+} CLOTHING;
+
 typedef struct
 {
     int row;
@@ -951,6 +972,12 @@ void initItems();
 void updateItems(int item);
 
 
+void initClothes();
+void updateClothes();
+CLOTHING findRandClothing();
+
+
+
 extern int livesremaining;
 void initLives();
 void updateLives(int lives);
@@ -971,6 +998,7 @@ void updateBullets();
 PLAYER player;
 ENEMY twig[10];
 BULLET bullets[1];
+CLOTHING clothes[5];
 
 
 OBJ_ATTR shadowOAM[128];
@@ -991,6 +1019,7 @@ void initGame()
     initLives();
     initBullets();
     initItems();
+    initClothes();
 }
 
 void initItems()
@@ -1004,6 +1033,29 @@ void initItems()
     shadowOAM[7].attr0 = 4 | (0 << 14);
     shadowOAM[7].attr1 = 215 | (0 << 14);
     shadowOAM[7].attr2 = ((4)*32 + (9));
+}
+
+void initClothes()
+{
+
+
+
+
+
+
+    for (int i = 0; i < 5; i++)
+    {
+        clothes[i].id = i;
+        clothes[i].initRow = (20 * (i % 6)) + 20;
+        clothes[i].row = (20 * (i % 6)) + 20;
+        clothes[i].col = 240;
+        clothes[i].active = 0;
+        clothes[i].height = 8;
+        clothes[i].width = 8;
+        shadowOAM[i + 70].attr0 = clothes[i].row | (0 << 14);
+        shadowOAM[i + 70].attr1 = clothes[i].col | (0 << 14);
+        shadowOAM[i + 70].attr2 = ((0)*32 + (i + 5));
+    }
 }
 
 void initLives()
@@ -1077,6 +1129,67 @@ void updateGame()
     updateBullets();
     updateLives(livesremaining);
     updateItems(itemsCollected);
+    updateClothes();
+}
+
+void updateClothes()
+{
+
+
+
+
+
+    for (int i = 0; i < 5; i++)
+    {
+        if (clothes[i].active == 1)
+        {
+
+            if (collision(player.col, player.row, player.width, player.height, clothes[i].col, clothes[i].row, clothes[i].width, clothes[i].height))
+            {
+                itemsCollected++;
+                clothes[i].active = 0;
+                clothes[i].row = 10;
+                clothes[i].col = 240 + 10;
+                shadowOAM[i + 70].attr0 = (2 << 8) | (0 << 14);
+            }
+
+            if (time % 2 == 0)
+            {
+                clothes[i].col -= 2;
+            }
+            if (clothes[i].col < 1)
+            {
+                clothes[i].active = 0;
+                clothes[i].row = 10;
+                clothes[i].col = 240;
+                shadowOAM[i + 70].attr0 = (2 << 8) | (0 << 14);
+            }
+
+            shadowOAM[i + 70].attr0 = clothes[i].row | (0 << 14);
+            shadowOAM[i + 70].attr1 = clothes[i].col | (0 << 14);
+        }
+    }
+    if (time % 257 == 0)
+    {
+        CLOTHING rand = findRandClothing();
+        clothes[rand.id].row = rand.initRow;
+        clothes[rand.id].col = 240;
+        clothes[rand.id].active = 1;
+    }
+}
+CLOTHING findRandClothing()
+{
+    CLOTHING rands[5];
+    int count = 0;
+    for (int i = 0; i < 5; i++)
+    {
+        if (clothes[i].active == 0)
+        {
+            rands[count] = clothes[i];
+            count++;
+        }
+    }
+    return rands[rand() % count];
 }
 
 void updateLives(int lives)
@@ -1139,7 +1252,6 @@ void updatePlayer()
     }
     if ((~((*(volatile unsigned short *)0x04000130)) & ((1 << 6))) && player.row > 1)
     {
-        itemsCollected++;
         player.row--;
     }
 

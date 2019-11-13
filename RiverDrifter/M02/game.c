@@ -16,17 +16,39 @@
 //shadowOAM [8] = "Progress in River"
 
 //shadowOAM [50 - 60] = Twig
-//shadowOAM [16] = Shirt
-//shadowOAM [17] = Short
-//shadowOAM [18] = Boots
-//shadowOAM [19] = Blanket
-//shadowOAM [20] = Hat
+//shadowOAM [70] = Shirt
+//shadowOAM [71] = Short
+//shadowOAM [72] = Boots
+//shadowOAM [73] = Blanket
+//shadowOAM [74] = Hat
 
 //shadowOAM [30 - 34] = bullets (rocks to be thrown)
 
 //shadowOAM [90] = left end of progress bar
 //shadowOAM [91] = middle part of progress bar
 //shadowOAM [92] = right end of progress bar
+
+enum
+{
+    SHIRT,
+    SHORT,
+    BOOTS,
+    BLANKET,
+    HAT
+};
+
+typedef struct
+{
+    int id;
+    int row;
+    int initRow;
+    int col;
+    int height;
+    int width;
+    int active;
+    int type;
+} CLOTHING;
+
 typedef struct
 {
     int row;
@@ -78,6 +100,12 @@ extern int itemsCollected;
 void initItems();
 void updateItems(int item);
 
+//clothing
+void initClothes();
+void updateClothes();
+CLOTHING findRandClothing();
+#define CLOTHINGCOUNT 5
+
 //lives
 extern int livesremaining;
 void initLives();
@@ -99,6 +127,7 @@ void updateBullets();
 PLAYER player;
 ENEMY twig[TWIGCOUNT];
 BULLET bullets[BULLETCOUNT];
+CLOTHING clothes[CLOTHINGCOUNT];
 
 // Shadow OAM
 OBJ_ATTR shadowOAM[128];
@@ -119,6 +148,7 @@ void initGame()
     initLives();
     initBullets();
     initItems();
+    initClothes();
 }
 
 void initItems()
@@ -132,6 +162,29 @@ void initItems()
     shadowOAM[7].attr0 = 4 | ATTR0_SQUARE;
     shadowOAM[7].attr1 = 215 | ATTR1_TINY;
     shadowOAM[7].attr2 = ATTR2_TILEID(9, 4);
+}
+
+void initClothes()
+{
+    //shadowOAM [70] = Shirt
+    //shadowOAM [71] = Short
+    //shadowOAM [72] = Boots
+    //shadowOAM [73] = Blanket
+    //shadowOAM [74] = Hat
+
+    for (int i = 0; i < CLOTHINGCOUNT; i++)
+    {
+        clothes[i].id = i;
+        clothes[i].initRow = (20 * (i % 6)) + 20;
+        clothes[i].row = (20 * (i % 6)) + 20;
+        clothes[i].col = SCREENWIDTH;
+        clothes[i].active = 0;
+        clothes[i].height = 8;
+        clothes[i].width = 8;
+        shadowOAM[i + 70].attr0 = clothes[i].row | ATTR0_SQUARE;
+        shadowOAM[i + 70].attr1 = clothes[i].col | ATTR1_TINY;
+        shadowOAM[i + 70].attr2 = ATTR2_TILEID(i + 5, 0);
+    }
 }
 
 void initLives()
@@ -205,6 +258,67 @@ void updateGame()
     updateBullets();
     updateLives(livesremaining);
     updateItems(itemsCollected);
+    updateClothes();
+}
+
+void updateClothes()
+{
+    //shadowOAM [70] = Shirt
+    //shadowOAM [71] = Short
+    //shadowOAM [72] = Boots
+    //shadowOAM [73] = Blanket
+    //shadowOAM [74] = Hat
+    for (int i = 0; i < CLOTHINGCOUNT; i++)
+    {
+        if (clothes[i].active == 1)
+        {
+            //if player collects item
+            if (collision(player.col, player.row, player.width, player.height, clothes[i].col, clothes[i].row, clothes[i].width, clothes[i].height))
+            {
+                itemsCollected++;
+                clothes[i].active = 0;
+                clothes[i].row = 10;
+                clothes[i].col = SCREENWIDTH + 10;
+                shadowOAM[i + 70].attr0 = ATTR0_HIDE | ATTR0_SQUARE;
+            }
+
+            if (time % 2 == 0)
+            {
+                clothes[i].col -= 2;
+            }
+            if (clothes[i].col < 1)
+            {
+                clothes[i].active = 0;
+                clothes[i].row = 10;
+                clothes[i].col = SCREENWIDTH;
+                shadowOAM[i + 70].attr0 = ATTR0_HIDE | ATTR0_SQUARE;
+            }
+
+            shadowOAM[i + 70].attr0 = clothes[i].row | ATTR0_SQUARE;
+            shadowOAM[i + 70].attr1 = clothes[i].col | ATTR1_TINY;
+        }
+    }
+    if (time % 257 == 0)
+    {
+        CLOTHING rand = findRandClothing();
+        clothes[rand.id].row = rand.initRow;
+        clothes[rand.id].col = SCREENWIDTH;
+        clothes[rand.id].active = 1;
+    }
+}
+CLOTHING findRandClothing()
+{
+    CLOTHING rands[CLOTHINGCOUNT];
+    int count = 0;
+    for (int i = 0; i < CLOTHINGCOUNT; i++)
+    {
+        if (clothes[i].active == 0)
+        {
+            rands[count] = clothes[i];
+            count++;
+        }
+    }
+    return rands[rand() % count];
 }
 
 void updateLives(int lives)
