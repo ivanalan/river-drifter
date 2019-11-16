@@ -29,6 +29,7 @@ OBJ_ATTR shadowOAM[128];
 unsigned short buttons;
 unsigned short oldButtons;
 extern int time = 0;
+int winGame;
 
 // Random Seed
 int seed;
@@ -213,7 +214,7 @@ void game()
     drawGame();
 
     //win condition
-    if (BUTTON_HELD(BUTTON_B))
+    if (winGame == 1)
     {
         REG_BG0HOFF = 0;
         goToWin();

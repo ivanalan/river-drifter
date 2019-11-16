@@ -14,6 +14,9 @@
 //shadowOAM [7] = digits (ex: 0,1,2,3)
 //shadowOAM [8] = "two digits"
 
+//shadowOAM [10 - 20] = timeline
+//shadowOAM [3] = player icon distance
+
 //shadowOAM [50 - 60] = Twig
 //shadowOAM [70] = Shirt
 //shadowOAM [71] = Short
@@ -123,6 +126,9 @@ void initBullets();
 void fireBullet();
 void updateBullets();
 
+//timeline
+void updateTimeline();
+
 PLAYER player;
 ENEMY twig[TWIGCOUNT];
 BULLET bullets[BULLETCOUNT];
@@ -132,12 +138,14 @@ CLOTHING clothes[CLOTHINGCOUNT];
 OBJ_ATTR shadowOAM[128];
 
 extern int time;
+extern int winGame;
 
 // Horizontal Offset
 unsigned short hOff;
 
 void initGame()
 {
+    winGame = 0;
     hOff = 0;
     time = 0;
     livesremaining = 3;
@@ -258,6 +266,43 @@ void updateGame()
     updateLives(livesremaining);
     updateItems(itemsCollected);
     updateClothes();
+    updateTimeline();
+}
+
+void updateTimeline()
+{
+    int speed = 15;
+    //update player distance icon
+    shadowOAM[3].attr0 = 6 | ATTR0_WIDE;
+    shadowOAM[3].attr1 = 74 + (player.distanceTraveled / speed) | ATTR1_TINY;
+    shadowOAM[3].attr2 = ATTR2_TILEID(13, 0) | ATTR2_PRIORITY(0);
+
+    int interval = 70;
+    //left bracket
+    shadowOAM[10].attr0 = 6 | ATTR0_SQUARE;
+    shadowOAM[10].attr1 = interval | ATTR1_TINY;
+    shadowOAM[10].attr2 = ATTR2_TILEID(10, 0);
+
+    int length = 0;
+    for (length = 0; length <= 8; length++)
+    {
+        interval += 8;
+        //middle line
+        shadowOAM[11 + length].attr0 = 6 | ATTR0_SQUARE;
+        shadowOAM[11 + length].attr1 = interval | ATTR1_TINY;
+        shadowOAM[11 + length].attr2 = ATTR2_TILEID(11, 0) | ATTR2_PRIORITY(1);
+    }
+
+    //right bracket
+    shadowOAM[20].attr0 = 6 | ATTR0_SQUARE;
+    shadowOAM[20].attr1 = (interval + 8) | ATTR1_TINY;
+    shadowOAM[20].attr2 = ATTR2_TILEID(12, 0);
+
+    //winGame if player icon reaches entire distance
+    if ((74 + (player.distanceTraveled / speed)) == interval + 8)
+    {
+        winGame = 1;
+    }
 }
 
 void updateClothes()

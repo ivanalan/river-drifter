@@ -170,6 +170,7 @@ OBJ_ATTR shadowOAM[128];
 unsigned short buttons;
 unsigned short oldButtons;
 extern int time = 0;
+int winGame;
 
 
 int seed;
@@ -354,7 +355,7 @@ void game()
     drawGame();
 
 
-    if ((~((*(volatile unsigned short *)0x04000130)) & ((1 << 1))))
+    if (winGame == 1)
     {
         (*(volatile unsigned short *)0x04000010) = 0;
         goToWin();

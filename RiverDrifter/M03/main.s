@@ -493,8 +493,8 @@ game:
 	mov	lr, pc
 	bx	r3
 	ldr	r3, .L76+8
-	ldrh	r3, [r3, #48]
-	ands	r3, r3, #2
+	ldr	r3, [r3]
+	cmp	r3, #1
 	beq	.L72
 	ldr	r4, .L76+12
 .L65:
@@ -526,9 +526,10 @@ game:
 	str	r2, [r3]
 	b	.L66
 .L72:
-	mov	r2, #67108864
+	mov	r3, #67108864
+	mov	r2, #0
 	ldr	r4, .L76+12
-	strh	r3, [r2, #16]	@ movhi
+	strh	r2, [r3, #16]	@ movhi
 	mov	lr, pc
 	bx	r4
 	mov	r2, #4
@@ -543,7 +544,7 @@ game:
 .L76:
 	.word	updateGame
 	.word	drawGame
-	.word	67109120
+	.word	winGame
 	.word	waitForVBlank
 	.word	livesremaining
 	.word	oldButtons
@@ -753,6 +754,7 @@ main:
 	.comm	itemsCollected,4,4
 	.comm	livesremaining,4,4
 	.comm	seed,4,4
+	.comm	winGame,4,4
 	.global	time
 	.comm	oldButtons,2,2
 	.comm	buttons,2,2
