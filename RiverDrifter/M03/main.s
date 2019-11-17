@@ -130,8 +130,11 @@ goToWin:
 	ldr	r3, .L16
 	mov	lr, pc
 	bx	r3
+	mov	r1, #67108864
+	mov	r0, #0
 	mov	r2, #4
 	ldr	r3, .L16+4
+	strh	r0, [r1, #20]	@ movhi
 	pop	{r4, lr}
 	str	r2, [r3]
 	bx	lr
@@ -323,7 +326,7 @@ goToGame:
 	bx	r4
 	mov	r5, #67108864
 	mov	r2, #20480
-	mov	r3, #5760
+	mov	r3, #928
 	strh	r2, [r5, #8]	@ movhi
 	mov	r0, #3
 	mov	r2, #100663296
@@ -336,21 +339,35 @@ goToGame:
 	ldr	r1, .L34+16
 	mov	lr, pc
 	bx	r4
+	ldr	r2, .L34+20
+	mov	r0, #3
+	strh	r2, [r5, #10]	@ movhi
+	ldr	r3, .L34+24
+	ldr	r2, .L34+28
+	ldr	r1, .L34+32
+	mov	lr, pc
+	bx	r4
+	mov	r3, #2048
+	mov	r0, #3
+	ldr	r2, .L34+36
+	ldr	r1, .L34+40
+	mov	lr, pc
+	bx	r4
 	mov	r3, #256
 	mov	r0, #3
-	ldr	r2, .L34+20
-	ldr	r1, .L34+24
+	ldr	r2, .L34+44
+	ldr	r1, .L34+48
 	mov	lr, pc
 	bx	r4
 	mov	r3, #16384
-	ldr	r2, .L34+28
-	ldr	r1, .L34+32
+	ldr	r2, .L34+52
+	ldr	r1, .L34+56
 	mov	r0, #3
 	mov	lr, pc
 	bx	r4
-	mov	r1, #4352
+	mov	r1, #4864
 	mov	r2, #1
-	ldr	r3, .L34+36
+	ldr	r3, .L34+60
 	strh	r1, [r5]	@ movhi
 	str	r2, [r3]
 	pop	{r4, r5, r6, lr}
@@ -359,10 +376,16 @@ goToGame:
 	.align	2
 .L34:
 	.word	DMANow
-	.word	riverPal
-	.word	riverTiles
+	.word	river1Pal
+	.word	river1Tiles
 	.word	100696064
-	.word	riverMap
+	.word	river1Map
+	.word	21508
+	.word	7712
+	.word	100679680
+	.word	topskyTiles
+	.word	100704256
+	.word	topskyMap
 	.word	83886592
 	.word	spritesheetPal
 	.word	100728832
@@ -485,7 +508,7 @@ game:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	push	{r4, lr}
+	push	{r4, r5, r6, lr}
 	ldr	r3, .L76
 	mov	lr, pc
 	bx	r3
@@ -514,7 +537,7 @@ game:
 .L67:
 	mov	lr, pc
 	bx	r4
-	pop	{r4, lr}
+	pop	{r4, r5, r6, lr}
 	bx	lr
 .L74:
 	mov	r2, #67108864
@@ -526,14 +549,15 @@ game:
 	str	r2, [r3]
 	b	.L66
 .L72:
-	mov	r3, #67108864
-	mov	r2, #0
+	mov	r5, #67108864
+	mov	r6, #0
 	ldr	r4, .L76+12
-	strh	r2, [r3, #16]	@ movhi
+	strh	r6, [r5, #16]	@ movhi
 	mov	lr, pc
 	bx	r4
 	mov	r2, #4
 	ldr	r3, .L76+28
+	strh	r6, [r5, #20]	@ movhi
 	str	r2, [r3]
 	b	.L65
 .L75:
@@ -544,7 +568,7 @@ game:
 .L76:
 	.word	updateGame
 	.word	drawGame
-	.word	winGame
+	.word	endGame
 	.word	waitForVBlank
 	.word	livesremaining
 	.word	oldButtons
@@ -754,7 +778,7 @@ main:
 	.comm	itemsCollected,4,4
 	.comm	livesremaining,4,4
 	.comm	seed,4,4
-	.comm	winGame,4,4
+	.comm	endGame,4,4
 	.global	time
 	.comm	oldButtons,2,2
 	.comm	buttons,2,2

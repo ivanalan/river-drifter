@@ -26,10 +26,6 @@
 
 //shadowOAM [30 - 34] = bullets (rocks to be thrown)
 
-//shadowOAM [90] = left end of progress bar
-//shadowOAM [91] = middle part of progress bar
-//shadowOAM [92] = right end of progress bar
-
 enum
 {
     SHIRT,
@@ -138,14 +134,14 @@ CLOTHING clothes[CLOTHINGCOUNT];
 OBJ_ATTR shadowOAM[128];
 
 extern int time;
-extern int winGame;
+extern int endGame;
 
 // Horizontal Offset
 unsigned short hOff;
 
 void initGame()
 {
-    winGame = 0;
+    endGame = 0;
     hOff = 0;
     time = 0;
     livesremaining = 3;
@@ -182,8 +178,8 @@ void initClothes()
     for (int i = 0; i < CLOTHINGCOUNT; i++)
     {
         clothes[i].id = i;
-        clothes[i].initRow = (20 * (i % 6)) + 20;
-        clothes[i].row = (20 * (i % 6)) + 20;
+        clothes[i].initRow = (8 * (i % 10)) + 81;
+        clothes[i].row = (8 * (i % 10)) + 81;
         clothes[i].col = SCREENWIDTH;
         clothes[i].active = 0;
         clothes[i].height = 8;
@@ -214,8 +210,8 @@ void initTwig()
         twig[i].active = 0;
 
         twig[i].col = SCREENWIDTH;
-        twig[i].initRow = (20 * (i % 6)) + 20;
-        twig[i].row = (20 * (i % 6)) + 20;
+        twig[i].initRow = (16 * (i % 5)) + 81;
+        twig[i].row = (16 * (i % 5)) + 81;
 
         twig[i].height = 16;
         twig[i].width = 16;
@@ -271,7 +267,7 @@ void updateGame()
 
 void updateTimeline()
 {
-    int speed = 15;
+    int speed = 20;
     //update player distance icon
     shadowOAM[3].attr0 = 6 | ATTR0_WIDE;
     shadowOAM[3].attr1 = 74 + (player.distanceTraveled / speed) | ATTR1_TINY;
@@ -298,10 +294,10 @@ void updateTimeline()
     shadowOAM[20].attr1 = (interval + 8) | ATTR1_TINY;
     shadowOAM[20].attr2 = ATTR2_TILEID(12, 0);
 
-    //winGame if player icon reaches entire distance
+    //endGame if player icon reaches entire distance
     if ((74 + (player.distanceTraveled / speed)) == interval + 8)
     {
-        winGame = 1;
+        endGame = 1;
     }
 }
 
@@ -455,6 +451,7 @@ void updatePlayer()
     shadowOAM[0].attr1 = player.col | ATTR1_TINY;
 
     REG_BG0HOFF = hOff;
+    REG_BG1HOFF = hOff / 20;
 }
 
 void updateTwig()

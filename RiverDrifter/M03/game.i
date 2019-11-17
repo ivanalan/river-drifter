@@ -896,9 +896,9 @@ extern long double strtold (const char *restrict, char **restrict);
 # 336 "c:\\devkitpro\\devkitarm\\arm-none-eabi\\include\\stdlib.h" 3
 
 # 4 "game.c" 2
-# 33 "game.c"
+# 29 "game.c"
 
-# 33 "game.c"
+# 29 "game.c"
 enum
 {
     SHIRT,
@@ -1007,14 +1007,14 @@ CLOTHING clothes[5];
 OBJ_ATTR shadowOAM[128];
 
 extern int time;
-extern int winGame;
+extern int endGame;
 
 
 unsigned short hOff;
 
 void initGame()
 {
-    winGame = 0;
+    endGame = 0;
     hOff = 0;
     time = 0;
     livesremaining = 3;
@@ -1051,8 +1051,8 @@ void initClothes()
     for (int i = 0; i < 5; i++)
     {
         clothes[i].id = i;
-        clothes[i].initRow = (20 * (i % 6)) + 20;
-        clothes[i].row = (20 * (i % 6)) + 20;
+        clothes[i].initRow = (8 * (i % 10)) + 81;
+        clothes[i].row = (8 * (i % 10)) + 81;
         clothes[i].col = 240;
         clothes[i].active = 0;
         clothes[i].height = 8;
@@ -1083,8 +1083,8 @@ void initTwig()
         twig[i].active = 0;
 
         twig[i].col = 240;
-        twig[i].initRow = (20 * (i % 6)) + 20;
-        twig[i].row = (20 * (i % 6)) + 20;
+        twig[i].initRow = (16 * (i % 5)) + 81;
+        twig[i].row = (16 * (i % 5)) + 81;
 
         twig[i].height = 16;
         twig[i].width = 16;
@@ -1140,7 +1140,7 @@ void updateGame()
 
 void updateTimeline()
 {
-    int speed = 15;
+    int speed = 20;
 
     shadowOAM[3].attr0 = 6 | (1 << 14);
     shadowOAM[3].attr1 = 74 + (player.distanceTraveled / speed) | (0 << 14);
@@ -1170,7 +1170,7 @@ void updateTimeline()
 
     if ((74 + (player.distanceTraveled / speed)) == interval + 8)
     {
-        winGame = 1;
+        endGame = 1;
     }
 }
 
@@ -1324,6 +1324,7 @@ void updatePlayer()
     shadowOAM[0].attr1 = player.col | (0 << 14);
 
     (*(volatile unsigned short *)0x04000010) = hOff;
+    (*(volatile unsigned short *)0x04000014) = hOff / 20;
 }
 
 void updateTwig()

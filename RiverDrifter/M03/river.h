@@ -5,11 +5,11 @@
 //
 //	river, 512x256@4, 
 //	+ palette 256 entries, not compressed
-//	+ 360 tiles (t|f|p reduced) not compressed
+//	+ 1317 tiles (t|f|p reduced) not compressed
 //	+ regular map (in SBBs), not compressed, 64x32 
-//	Total size: 512 + 11520 + 4096 = 16128
+//	Total size: 512 + 42144 + 4096 = 46752
 //
-//	Time-stamp: 2019-11-08, 00:11:35
+//	Time-stamp: 2019-11-16, 20:46:18
 //	Exported by Cearn's GBA Image Transmogrifier, v0.8.3
 //	( http://www.coranac.com/projects/#grit )
 //
@@ -18,8 +18,8 @@
 #ifndef GRIT_RIVER_H
 #define GRIT_RIVER_H
 
-#define riverTilesLen 11520
-extern const unsigned short riverTiles[5760];
+#define riverTilesLen 42144
+extern const unsigned short riverTiles[21072];
 
 #define riverMapLen 4096
 extern const unsigned short riverMap[2048];

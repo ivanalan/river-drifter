@@ -86,7 +86,7 @@ initClothes:
 	@ frame_needed = 0, uses_anonymous_args = 0
 	mov	r2, #0
 	push	{r4, r5, lr}
-	mov	r0, #20
+	mov	r0, #81
 	mov	r5, r2
 	mov	lr, #240
 	mov	ip, #8
@@ -94,8 +94,8 @@ initClothes:
 	ldr	r1, .L14+4
 .L11:
 	str	r2, [r3]
+	add	r4, r2, #5
 	add	r2, r2, #1
-	add	r4, r2, #4
 	cmp	r2, #5
 	str	r0, [r3, #8]
 	str	r0, [r3, #4]
@@ -107,7 +107,7 @@ initClothes:
 	strh	lr, [r1, #2]	@ movhi
 	strh	r4, [r1, #4]	@ movhi
 	add	r3, r3, #32
-	add	r0, r0, #20
+	add	r0, r0, #8
 	add	r1, r1, #8
 	bne	.L11
 	pop	{r4, r5, lr}
@@ -172,15 +172,14 @@ initTwig:
 	ldr	r4, .L24+8
 	ldr	lr, .L24+12
 .L21:
-	umull	r8, r3, r4, r1
-	lsr	r3, r3, #2
-	add	r3, r3, r3, lsl #1
-	sub	r3, r1, r3, lsl #1
-	add	r3, r3, #1
+	umull	r3, r8, r4, r1
+	bic	r3, r8, #3
+	add	r3, r3, r8, lsr #2
+	sub	r3, r1, r3
 	str	r1, [r2]
-	add	r3, r3, r3, lsl #2
+	lsl	r3, r3, #4
 	add	r1, r1, #1
-	lsl	r3, r3, #2
+	add	r3, r3, #81
 	cmp	r1, #10
 	str	r6, [r2, #36]
 	str	r7, [r2, #12]
@@ -201,7 +200,7 @@ initTwig:
 .L24:
 	.word	twig
 	.word	shadowOAM+400
-	.word	-1431655765
+	.word	-858993459
 	.word	16624
 	.size	initTwig, .-initTwig
 	.align	2
@@ -283,7 +282,7 @@ initGame:
 .L29:
 	.align	2
 .L28:
-	.word	winGame
+	.word	endGame
 	.word	hOff
 	.word	time
 	.word	itemsCollected
@@ -392,7 +391,6 @@ updateTimeline:
 	ldr	ip, .L43+8
 	ldr	r0, [r0, #24]
 	smull	r9, ip, r0, ip
-	add	ip, ip, r0
 	asr	r0, r0, #31
 	rsb	ip, r0, ip, asr #3
 	add	r0, ip, #74
@@ -428,10 +426,10 @@ updateTimeline:
 .L43:
 	.word	shadowOAM
 	.word	player
-	.word	-2004318071
+	.word	1717986919
 	.word	16390
 	.word	1035
-	.word	winGame
+	.word	endGame
 	.size	updateTimeline, .-updateTimeline
 	.global	__aeabi_idivmod
 	.align	2
@@ -801,16 +799,21 @@ updatePlayer:
 	cmp	r3, #0
 	bleq	fireBullet.part.0
 .L86:
-	mov	r1, #67108864
+	mov	r2, #67108864
 	ldr	r3, [r4]
-	ldr	ip, [r4, #4]
-	ldrh	r0, [r5]
-	ldr	r2, .L93+28
+	ldrh	ip, [r5]
+	ldr	r1, .L93+28
 	orr	r3, r3, #16384
-	strh	r3, [r2]	@ movhi
-	strh	ip, [r2, #2]	@ movhi
+	ldr	r0, [r4, #4]
+	strh	r3, [r1]	@ movhi
+	strh	ip, [r2, #16]	@ movhi
+	ldr	ip, .L93+32
+	ldrh	r3, [r5]
+	umull	lr, r3, ip, r3
+	lsr	r3, r3, #4
+	strh	r0, [r1, #2]	@ movhi
 	pop	{r4, r5, r6, lr}
-	strh	r0, [r1, #16]	@ movhi
+	strh	r3, [r2, #20]	@ movhi
 	bx	lr
 .L94:
 	.align	2
@@ -823,6 +826,7 @@ updatePlayer:
 	.word	buttons
 	.word	bullets
 	.word	shadowOAM
+	.word	-858993459
 	.size	updatePlayer, .-updatePlayer
 	.align	2
 	.global	findRandTwig

@@ -102,7 +102,7 @@ extern const unsigned short pausePal[256];
 # 4 "main.c" 2
 # 1 "river.h" 1
 # 22 "river.h"
-extern const unsigned short riverTiles[5760];
+extern const unsigned short riverTiles[21072];
 
 
 extern const unsigned short riverMap[2048];
@@ -110,6 +110,26 @@ extern const unsigned short riverMap[2048];
 
 extern const unsigned short riverPal[256];
 # 5 "main.c" 2
+# 1 "river1.h" 1
+# 22 "river1.h"
+extern const unsigned short river1Tiles[928];
+
+
+extern const unsigned short river1Map[2048];
+
+
+extern const unsigned short river1Pal[256];
+# 6 "main.c" 2
+# 1 "topsky.h" 1
+# 22 "topsky.h"
+extern const unsigned short topskyTiles[7712];
+
+
+extern const unsigned short topskyMap[2048];
+
+
+extern const unsigned short topskyPal[256];
+# 7 "main.c" 2
 # 1 "lose.h" 1
 # 22 "lose.h"
 extern const unsigned short loseTiles[9568];
@@ -119,7 +139,7 @@ extern const unsigned short loseMap[1024];
 
 
 extern const unsigned short losePal[256];
-# 6 "main.c" 2
+# 8 "main.c" 2
 # 1 "win.h" 1
 # 22 "win.h"
 extern const unsigned short winTiles[8256];
@@ -129,7 +149,7 @@ extern const unsigned short winMap[1024];
 
 
 extern const unsigned short winPal[256];
-# 7 "main.c" 2
+# 9 "main.c" 2
 # 1 "instructions.h" 1
 # 22 "instructions.h"
 extern const unsigned short instructionsTiles[9424];
@@ -139,14 +159,14 @@ extern const unsigned short instructionsMap[1024];
 
 
 extern const unsigned short instructionsPal[256];
-# 8 "main.c" 2
+# 10 "main.c" 2
 # 1 "spritesheet.h" 1
 # 21 "spritesheet.h"
 extern const unsigned short spritesheetTiles[16384];
 
 
 extern const unsigned short spritesheetPal[256];
-# 9 "main.c" 2
+# 11 "main.c" 2
 
 
 void initialize();
@@ -170,7 +190,7 @@ OBJ_ATTR shadowOAM[128];
 unsigned short buttons;
 unsigned short oldButtons;
 extern int time = 0;
-int winGame;
+int endGame;
 
 
 int seed;
@@ -270,6 +290,7 @@ void start()
 void goToWin()
 {
     waitForVBlank();
+    (*(volatile unsigned short *)0x04000014) = 0;
     state = WIN;
 }
 
@@ -335,16 +356,22 @@ void pause()
 void goToGame()
 {
 
-    DMANow(3, riverPal, ((unsigned short *)0x5000000), 512 / 2);
+    DMANow(3, river1Pal, ((unsigned short *)0x5000000), 512 / 2);
+
     (*(volatile unsigned short *)0x4000008) = ((0) << 2) | ((16) << 8) | (1 << 14);
-    DMANow(3, riverTiles, &((charblock *)0x6000000)[0], 11520 / 2);
-    DMANow(3, riverMap, &((screenblock *)0x6000000)[16], 4096 / 2);
+    DMANow(3, river1Tiles, &((charblock *)0x6000000)[0], 1856 / 2);
+    DMANow(3, river1Map, &((screenblock *)0x6000000)[16], 4096 / 2);
+
+
+    (*(volatile unsigned short *)0x400000A) = ((1) << 2) | ((20) << 8) | (1 << 14);
+    DMANow(3, topskyTiles, &((charblock *)0x6000000)[1], 15424 / 2);
+    DMANow(3, topskyMap, &((screenblock *)0x6000000)[20], 4096 / 2);
 
 
     DMANow(3, spritesheetPal, ((unsigned short *)0x5000200), 512 / 2);
     DMANow(3, spritesheetTiles, &((charblock *)0x6000000)[4], 32768 / 2);
 
-    (*(unsigned short *)0x4000000) = 0 | (1 << 8) | (1 << 12);
+    (*(unsigned short *)0x4000000) = 0 | (1 << 8) | (1 << 9) | (1 << 12);
 
     state = GAME;
 }
@@ -355,7 +382,7 @@ void game()
     drawGame();
 
 
-    if (winGame == 1)
+    if (endGame == 1)
     {
         (*(volatile unsigned short *)0x04000010) = 0;
         goToWin();

@@ -2,6 +2,8 @@
 #include "splashScreen.h"
 #include "pause.h"
 #include "river.h"
+#include "river1.h"
+#include "topsky.h"
 #include "lose.h"
 #include "win.h"
 #include "instructions.h"
@@ -29,7 +31,7 @@ OBJ_ATTR shadowOAM[128];
 unsigned short buttons;
 unsigned short oldButtons;
 extern int time = 0;
-int winGame;
+int endGame;
 
 // Random Seed
 int seed;
@@ -129,6 +131,7 @@ void start()
 void goToWin()
 {
     waitForVBlank();
+    REG_BG1HOFF = 0;
     state = WIN;
 }
 
@@ -193,17 +196,23 @@ void pause()
 }
 void goToGame()
 {
-    //load bg screen
-    DMANow(3, riverPal, PALETTE, riverPalLen / 2);
+    //load river screen
+    DMANow(3, river1Pal, PALETTE, river1PalLen / 2);
+
     REG_BG0CNT = BG_CHARBLOCK(0) | BG_SCREENBLOCK(16) | BG_SIZE_WIDE;
-    DMANow(3, riverTiles, &CHARBLOCK[0], riverTilesLen / 2);
-    DMANow(3, riverMap, &SCREENBLOCK[16], riverMapLen / 2);
+    DMANow(3, river1Tiles, &CHARBLOCK[0], river1TilesLen / 2);
+    DMANow(3, river1Map, &SCREENBLOCK[16], river1MapLen / 2);
+
+    //load sky screen
+    REG_BG1CNT = BG_CHARBLOCK(1) | BG_SCREENBLOCK(20) | BG_SIZE_WIDE;
+    DMANow(3, topskyTiles, &CHARBLOCK[1], topskyTilesLen / 2);
+    DMANow(3, topskyMap, &SCREENBLOCK[20], topskyMapLen / 2);
 
     //setup sprites
     DMANow(3, spritesheetPal, SPRITEPALETTE, spritesheetPalLen / 2);
     DMANow(3, spritesheetTiles, &CHARBLOCK[4], spritesheetTilesLen / 2);
 
-    REG_DISPCTL = MODE0 | BG0_ENABLE | SPRITE_ENABLE;
+    REG_DISPCTL = MODE0 | BG0_ENABLE | BG1_ENABLE | SPRITE_ENABLE;
 
     state = GAME;
 }
@@ -214,7 +223,7 @@ void game()
     drawGame();
 
     //win condition
-    if (winGame == 1)
+    if (endGame == 1)
     {
         REG_BG0HOFF = 0;
         goToWin();
