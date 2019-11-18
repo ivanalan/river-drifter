@@ -136,6 +136,7 @@ OBJ_ATTR shadowOAM[128];
 
 extern int time;
 extern int endGame;
+extern int cheat = 0;
 
 // Horizontal Offset
 unsigned short hOff;
@@ -144,6 +145,7 @@ void initGame()
 {
     endGame = 0;
     hOff = 0;
+    cheat = 0;
     time = 0;
     livesremaining = 3;
     itemsCollected = 0;
@@ -270,7 +272,7 @@ void updateTimeline()
 {
     //text: "River Progress"
     shadowOAM[21].attr0 = 3 | ATTR0_WIDE;
-    shadowOAM[21].attr1 = 90 | ATTR1_LARGE;
+    shadowOAM[21].attr1 = 93 | ATTR1_LARGE;
     shadowOAM[21].attr2 = ATTR2_TILEID(0, 5);
 
     int speed = 20;
@@ -437,7 +439,7 @@ void updatePlayer()
         hOff++;
         player.distanceTraveled++;
     }
-    if (BUTTON_HELD(BUTTON_UP) && player.row > 1)
+    if (BUTTON_HELD(BUTTON_UP) && player.row > 80)
     {
         player.row--;
     }
@@ -467,7 +469,7 @@ void updateTwig()
         if (twig[i].active == 1)
         {
             //decrease lives if collision with twig
-            if (collision(twig[i].col, twig[i].row, twig[i].width, twig[i].height, player.col, player.row, player.width, player.height))
+            if (!cheat && collision(twig[i].col, twig[i].row, twig[i].width, twig[i].height, player.col, player.row, player.width, player.height))
             {
                 livesremaining = livesremaining - 1;
                 twig[i].active = 0;

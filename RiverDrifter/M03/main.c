@@ -1,3 +1,33 @@
+/*
+River Drifter - GAME INFO
+
+WHAT IS FINISHED?
+- Fixed bug so that Items collected can now go to 99
+- Updated river graphic and sky background
+- Parallax Simultaneous backgrounds
+- Added Distance Traveled on top of screen
+- Cheat
+
+WHAT NEEDS TO BE ADDED?
+- Make cheat change player color
+- Actual Graphics for sprites
+- Animation
+- Sound
+
+BUGS?
+- None I am aware of so far
+
+HOW TO PLAY?
+- Press enter to start game, pause  
+- Press x to restart game from pause, press start to go back to game from pause
+- Pressing z during game activates cheat which allows you to be invincible to twigs
+- Press up arrow to move up
+- Press down arrow to move down
+- Press x to throw rock and "sink" twigs
+- Try to collect as many items as you can
+- Hitting a twig will take away a life
+
+*/
 #include "myLib.h"
 #include "splashScreen.h"
 #include "pause.h"
@@ -38,6 +68,7 @@ int seed;
 
 int livesremaining;
 int itemsCollected;
+int cheat;
 
 enum
 {
@@ -225,8 +256,17 @@ void game()
     //win condition
     if (endGame == 1)
     {
-        REG_BG0HOFF = 0;
-        goToWin();
+        if (itemsCollected >= 5)
+        {
+            REG_BG0HOFF = 0;
+            goToWin();
+        }
+        else
+        {
+            REG_BG0HOFF = 0;
+            REG_BG1HOFF = 0;
+            goToLose();
+        }
     }
 
     //lose condition
@@ -237,6 +277,11 @@ void game()
         goToLose();
     }
 
+    // activate Cheat
+    if (BUTTON_PRESSED(BUTTON_B))
+    {
+        cheat = 1;
+    }
     //pause condition
     if (BUTTON_PRESSED(BUTTON_START))
     {
