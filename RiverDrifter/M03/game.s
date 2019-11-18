@@ -377,49 +377,54 @@ updateTimeline:
 	@ Function supports interworking.
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	push	{r4, r5, r6, r7, r8, r9, lr}
-	mov	r6, #6
-	mov	r5, #70
-	ldr	lr, .L43
-	mov	r8, #13
-	mov	r7, #10
-	mov	r4, lr
-	mov	r3, lr
+	push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+	mov	r6, #13
+	mov	r8, #70
+	ldr	r0, .L43
+	mov	r10, #160
+	mov	r9, #10
+	mov	r5, r0
+	mov	r3, r0
 	mov	r1, r6
-	mov	r2, r5
-	ldr	r0, .L43+4
-	ldr	ip, .L43+8
-	ldr	r0, [r0, #24]
-	smull	r9, ip, r0, ip
-	asr	r0, r0, #31
-	rsb	ip, r0, ip, asr #3
-	add	r0, ip, #74
-	strh	r0, [lr, #26]	@ movhi
-	ldr	r0, .L43+12
-	strh	r8, [lr, #28]	@ movhi
-	strh	r0, [lr, #24]	@ movhi
-	strh	r7, [lr, #84]	@ movhi
-	strh	r6, [lr, #80]	@ movhi
-	strh	r5, [lr, #82]	@ movhi
-	ldr	r0, .L43+16
+	mov	r2, r8
+	mov	ip, #11
+	ldr	r4, .L43+4
+	ldr	lr, .L43+8
+	ldr	r4, [r4, #24]
+	smull	fp, r7, lr, r4
+	asr	lr, r4, #31
+	rsb	lr, lr, r7, asr #3
+	add	r4, lr, #74
+	strh	r4, [r0, #26]	@ movhi
+	ldr	r4, .L43+12
+	strh	r4, [r0, #168]	@ movhi
+	ldr	r4, .L43+16
+	strh	r4, [r0, #170]	@ movhi
+	ldr	r4, .L43+20
+	strh	r10, [r0, #172]	@ movhi
+	strh	r9, [r0, #84]	@ movhi
+	strh	r6, [r0, #28]	@ movhi
+	strh	r4, [r0, #24]	@ movhi
+	strh	r6, [r0, #80]	@ movhi
+	strh	r8, [r0, #82]	@ movhi
 .L39:
 	add	r2, r2, #8
 	cmp	r2, #142
 	strh	r2, [r3, #90]	@ movhi
 	strh	r1, [r3, #88]	@ movhi
-	strh	r0, [r3, #92]	@ movhi
+	strh	ip, [r3, #92]	@ movhi
 	add	r3, r3, #8
 	bne	.L39
 	mov	r2, #150
 	mov	r3, #12
-	cmp	ip, #76
-	strh	r2, [r4, #162]	@ movhi
+	cmp	lr, #76
+	strh	r2, [r5, #162]	@ movhi
 	moveq	r2, #1
-	strh	r3, [r4, #164]	@ movhi
-	ldreq	r3, .L43+20
-	strh	r1, [r4, #160]	@ movhi
+	strh	r3, [r5, #164]	@ movhi
+	ldreq	r3, .L43+24
+	strh	r1, [r5, #160]	@ movhi
 	streq	r2, [r3]
-	pop	{r4, r5, r6, r7, r8, r9, lr}
+	pop	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
 	bx	lr
 .L44:
 	.align	2
@@ -427,8 +432,9 @@ updateTimeline:
 	.word	shadowOAM
 	.word	player
 	.word	1717986919
-	.word	16390
-	.word	1035
+	.word	16387
+	.word	-16294
+	.word	16397
 	.word	endGame
 	.size	updateTimeline, .-updateTimeline
 	.global	__aeabi_idivmod

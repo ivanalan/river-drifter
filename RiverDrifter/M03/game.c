@@ -15,6 +15,7 @@
 //shadowOAM [8] = "two digits"
 
 //shadowOAM [10 - 20] = timeline
+//shadowOAM [21] = "Distance Traveled"
 //shadowOAM [3] = player icon distance
 
 //shadowOAM [50 - 60] = Twig
@@ -267,15 +268,20 @@ void updateGame()
 
 void updateTimeline()
 {
+    //text: "River Progress"
+    shadowOAM[21].attr0 = 3 | ATTR0_WIDE;
+    shadowOAM[21].attr1 = 90 | ATTR1_LARGE;
+    shadowOAM[21].attr2 = ATTR2_TILEID(0, 5);
+
     int speed = 20;
     //update player distance icon
-    shadowOAM[3].attr0 = 6 | ATTR0_WIDE;
+    shadowOAM[3].attr0 = 13 | ATTR0_WIDE;
     shadowOAM[3].attr1 = 74 + (player.distanceTraveled / speed) | ATTR1_TINY;
-    shadowOAM[3].attr2 = ATTR2_TILEID(13, 0) | ATTR2_PRIORITY(0);
+    shadowOAM[3].attr2 = ATTR2_TILEID(13, 0);
 
     int interval = 70;
     //left bracket
-    shadowOAM[10].attr0 = 6 | ATTR0_SQUARE;
+    shadowOAM[10].attr0 = 13 | ATTR0_SQUARE;
     shadowOAM[10].attr1 = interval | ATTR1_TINY;
     shadowOAM[10].attr2 = ATTR2_TILEID(10, 0);
 
@@ -284,13 +290,13 @@ void updateTimeline()
     {
         interval += 8;
         //middle line
-        shadowOAM[11 + length].attr0 = 6 | ATTR0_SQUARE;
+        shadowOAM[11 + length].attr0 = 13 | ATTR0_SQUARE;
         shadowOAM[11 + length].attr1 = interval | ATTR1_TINY;
-        shadowOAM[11 + length].attr2 = ATTR2_TILEID(11, 0) | ATTR2_PRIORITY(1);
+        shadowOAM[11 + length].attr2 = ATTR2_TILEID(11, 0);
     }
 
     //right bracket
-    shadowOAM[20].attr0 = 6 | ATTR0_SQUARE;
+    shadowOAM[20].attr0 = 13 | ATTR0_SQUARE;
     shadowOAM[20].attr1 = (interval + 8) | ATTR1_TINY;
     shadowOAM[20].attr2 = ATTR2_TILEID(12, 0);
 

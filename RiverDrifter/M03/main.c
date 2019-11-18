@@ -233,6 +233,7 @@ void game()
     if (livesremaining == 0)
     {
         REG_BG0HOFF = 0;
+        REG_BG1HOFF = 0;
         goToLose();
     }
 

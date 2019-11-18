@@ -392,6 +392,7 @@ void game()
     if (livesremaining == 0)
     {
         (*(volatile unsigned short *)0x04000010) = 0;
+        (*(volatile unsigned short *)0x04000014) = 0;
         goToLose();
     }
 

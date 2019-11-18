@@ -896,9 +896,9 @@ extern long double strtold (const char *restrict, char **restrict);
 # 336 "c:\\devkitpro\\devkitarm\\arm-none-eabi\\include\\stdlib.h" 3
 
 # 4 "game.c" 2
-# 29 "game.c"
+# 30 "game.c"
 
-# 29 "game.c"
+# 30 "game.c"
 enum
 {
     SHIRT,
@@ -1140,15 +1140,20 @@ void updateGame()
 
 void updateTimeline()
 {
+
+    shadowOAM[21].attr0 = 3 | (1 << 14);
+    shadowOAM[21].attr1 = 90 | (3 << 14);
+    shadowOAM[21].attr2 = ((5)*32 + (0));
+
     int speed = 20;
 
-    shadowOAM[3].attr0 = 6 | (1 << 14);
+    shadowOAM[3].attr0 = 13 | (1 << 14);
     shadowOAM[3].attr1 = 74 + (player.distanceTraveled / speed) | (0 << 14);
-    shadowOAM[3].attr2 = ((0)*32 + (13)) | ((0) << 10);
+    shadowOAM[3].attr2 = ((0)*32 + (13));
 
     int interval = 70;
 
-    shadowOAM[10].attr0 = 6 | (0 << 14);
+    shadowOAM[10].attr0 = 13 | (0 << 14);
     shadowOAM[10].attr1 = interval | (0 << 14);
     shadowOAM[10].attr2 = ((0)*32 + (10));
 
@@ -1157,13 +1162,13 @@ void updateTimeline()
     {
         interval += 8;
 
-        shadowOAM[11 + length].attr0 = 6 | (0 << 14);
+        shadowOAM[11 + length].attr0 = 13 | (0 << 14);
         shadowOAM[11 + length].attr1 = interval | (0 << 14);
-        shadowOAM[11 + length].attr2 = ((0)*32 + (11)) | ((1) << 10);
+        shadowOAM[11 + length].attr2 = ((0)*32 + (11));
     }
 
 
-    shadowOAM[20].attr0 = 6 | (0 << 14);
+    shadowOAM[20].attr0 = 13 | (0 << 14);
     shadowOAM[20].attr1 = (interval + 8) | (0 << 14);
     shadowOAM[20].attr2 = ((0)*32 + (12));
 

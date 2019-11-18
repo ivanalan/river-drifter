@@ -542,6 +542,7 @@ game:
 .L74:
 	mov	r2, #67108864
 	strh	r3, [r2, #16]	@ movhi
+	strh	r3, [r2, #20]	@ movhi
 	mov	lr, pc
 	bx	r4
 	mov	r2, #5
