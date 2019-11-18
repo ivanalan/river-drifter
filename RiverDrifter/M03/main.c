@@ -7,10 +7,12 @@ WHAT IS FINISHED?
 - Parallax Simultaneous backgrounds
 - Added Distance Traveled on top of screen
 - Cheat
+- Added Lose condition if < 5 items collected
 
 WHAT NEEDS TO BE ADDED?
 - Make cheat change player color
 - Actual Graphics for sprites
+- Update Instructions Page
 - Animation
 - Sound
 
@@ -24,7 +26,7 @@ HOW TO PLAY?
 - Press up arrow to move up
 - Press down arrow to move down
 - Press x to throw rock and "sink" twigs
-- Try to collect as many items as you can
+- To win collect more than 5 items and reach the end of the river
 - Hitting a twig will take away a life
 
 */
@@ -36,6 +38,7 @@ HOW TO PLAY?
 #include "topsky.h"
 #include "lose.h"
 #include "win.h"
+#include "loseItems.h"
 #include "instructions.h"
 #include "spritesheet.h"
 
@@ -46,12 +49,14 @@ void goToGame();
 void goToPause();
 void goToWin();
 void goToLose();
+void goToLoseItems();
 void goToInstruct();
 void start();
 void game();
 void pause();
 void win();
 void lose();
+void loseItems();
 void instruct();
 
 // Shadow OAM
@@ -77,7 +82,8 @@ enum
     INSTRUCT,
     PAUSE,
     WIN,
-    LOSE
+    LOSE,
+    LOSEITEMS
 };
 int state;
 
@@ -112,6 +118,9 @@ int main()
             break;
         case LOSE:
             lose();
+            break;
+        case LOSEITEMS:
+            loseItems();
             break;
         }
     }
@@ -253,19 +262,21 @@ void game()
     updateGame();
     drawGame();
 
-    //win condition
+    //Reached end of river
     if (endGame == 1)
     {
+        // win condition
         if (itemsCollected >= 5)
         {
             REG_BG0HOFF = 0;
             goToWin();
         }
+        //not enough items lose condition
         else
         {
             REG_BG0HOFF = 0;
             REG_BG1HOFF = 0;
-            goToLose();
+            goToLoseItems();
         }
     }
 
@@ -312,6 +323,28 @@ void instruct()
     REG_BG1CNT = BG_CHARBLOCK(0) | BG_SCREENBLOCK(16) | BG_SIZE_SMALL;
     DMANow(3, instructionsTiles, &CHARBLOCK[0], instructionsTilesLen / 2);
     DMANow(3, instructionsMap, &SCREENBLOCK[16], instructionsMapLen / 2);
+
+    //go back to start/reset
+    if (BUTTON_PRESSED(BUTTON_START))
+    {
+        goToStart();
+    }
+}
+
+void goToLoseItems()
+{
+    waitForVBlank();
+    state = LOSEITEMS;
+}
+void loseItems()
+{
+    REG_DISPCTL = MODE0 | BG1_ENABLE;
+
+    //load lose screen
+    DMANow(3, loseItemsPal, PALETTE, loseItemsPalLen / 2);
+    REG_BG1CNT = BG_CHARBLOCK(0) | BG_SCREENBLOCK(16) | BG_SIZE_SMALL;
+    DMANow(3, loseItemsTiles, &CHARBLOCK[0], loseItemsTilesLen / 2);
+    DMANow(3, loseItemsMap, &SCREENBLOCK[16], loseItemsMapLen / 2);
 
     //go back to start/reset
     if (BUTTON_PRESSED(BUTTON_START))
