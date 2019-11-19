@@ -1,4 +1,4 @@
-# river-drifter
-2261 project
+# River Drifter
+2261 final project
 
 
