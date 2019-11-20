@@ -2,7 +2,7 @@
 # 1 "<built-in>"
 # 1 "<command-line>"
 # 1 "main.c"
-# 29 "main.c"
+# 30 "main.c"
 # 1 "myLib.h" 1
 
 
@@ -80,7 +80,19 @@ void DMANow(int channel, volatile const void *src, volatile void *dst, unsigned 
 
 
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
-# 30 "main.c" 2
+# 328 "myLib.h"
+typedef struct
+{
+    const unsigned char *data;
+    int length;
+    int frequency;
+    int isPlaying;
+    int loops;
+    int duration;
+    int priority;
+    int vBlankCount;
+} SOUND;
+# 31 "main.c" 2
 # 1 "splashScreen.h" 1
 # 22 "splashScreen.h"
 extern const unsigned short splashScreenTiles[9504];
@@ -90,7 +102,7 @@ extern const unsigned short splashScreenMap[1024];
 
 
 extern const unsigned short splashScreenPal[256];
-# 31 "main.c" 2
+# 32 "main.c" 2
 # 1 "pause.h" 1
 # 22 "pause.h"
 extern const unsigned short pauseTiles[9456];
@@ -100,7 +112,7 @@ extern const unsigned short pauseMap[1024];
 
 
 extern const unsigned short pausePal[256];
-# 32 "main.c" 2
+# 33 "main.c" 2
 # 1 "river.h" 1
 # 22 "river.h"
 extern const unsigned short riverTiles[21072];
@@ -110,7 +122,7 @@ extern const unsigned short riverMap[2048];
 
 
 extern const unsigned short riverPal[256];
-# 33 "main.c" 2
+# 34 "main.c" 2
 # 1 "river1.h" 1
 # 22 "river1.h"
 extern const unsigned short river1Tiles[928];
@@ -120,7 +132,7 @@ extern const unsigned short river1Map[2048];
 
 
 extern const unsigned short river1Pal[256];
-# 34 "main.c" 2
+# 35 "main.c" 2
 # 1 "topsky.h" 1
 # 22 "topsky.h"
 extern const unsigned short topskyTiles[7712];
@@ -130,7 +142,7 @@ extern const unsigned short topskyMap[2048];
 
 
 extern const unsigned short topskyPal[256];
-# 35 "main.c" 2
+# 36 "main.c" 2
 # 1 "lose.h" 1
 # 22 "lose.h"
 extern const unsigned short loseTiles[9568];
@@ -140,7 +152,7 @@ extern const unsigned short loseMap[1024];
 
 
 extern const unsigned short losePal[256];
-# 36 "main.c" 2
+# 37 "main.c" 2
 # 1 "win.h" 1
 # 22 "win.h"
 extern const unsigned short winTiles[8256];
@@ -150,7 +162,30 @@ extern const unsigned short winMap[1024];
 
 
 extern const unsigned short winPal[256];
-# 37 "main.c" 2
+# 38 "main.c" 2
+# 1 "sound.h" 1
+SOUND soundA;
+SOUND soundB;
+
+void setupSounds();
+void playSoundA( const unsigned char* sound, int length, int frequency, int loops);
+void playSoundB( const unsigned char* sound, int length, int frequency, int loops);
+
+void setupInterrupts();
+void interruptHandler();
+
+void pauseSound();
+void unpauseSound();
+void stopSound();
+# 39 "main.c" 2
+# 1 "moonRiver.h" 1
+# 20 "moonRiver.h"
+extern const unsigned char moonRiver[2077344];
+# 40 "main.c" 2
+# 1 "TitleSong.h" 1
+# 20 "TitleSong.h"
+extern const unsigned char TitleSong[202411];
+# 41 "main.c" 2
 # 1 "loseItems.h" 1
 # 22 "loseItems.h"
 extern const unsigned short loseItemsTiles[8464];
@@ -160,7 +195,7 @@ extern const unsigned short loseItemsMap[1024];
 
 
 extern const unsigned short loseItemsPal[256];
-# 38 "main.c" 2
+# 42 "main.c" 2
 # 1 "instructions.h" 1
 # 22 "instructions.h"
 extern const unsigned short instructionsTiles[9472];
@@ -170,14 +205,14 @@ extern const unsigned short instructionsMap[1024];
 
 
 extern const unsigned short instructionsPal[256];
-# 39 "main.c" 2
+# 43 "main.c" 2
 # 1 "spritesheet.h" 1
 # 21 "spritesheet.h"
 extern const unsigned short spritesheetTiles[16384];
 
 
 extern const unsigned short spritesheetPal[256];
-# 40 "main.c" 2
+# 44 "main.c" 2
 
 
 void initialize();
@@ -265,6 +300,8 @@ int main()
 
 void initialize()
 {
+    setupSounds();
+    setupInterrupts();
 
     goToStart();
 
@@ -272,6 +309,9 @@ void initialize()
 }
 void goToStart()
 {
+
+    stopSound();
+    playSoundA(TitleSong, 202411, 11025, 1);
 
 
     initGame();
@@ -297,11 +337,14 @@ void start()
     {
         goToGame();
         srand(seed);
+        stopSound();
+        playSoundA(moonRiver, 2077344, 11025, 1);
     }
 
 
     if ((!(~(oldButtons) & ((1 << 0))) && (~buttons & ((1 << 0)))))
     {
+        stopSound();
         goToInstruct();
     }
 }
@@ -365,10 +408,12 @@ void pause()
 
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3)))))
     {
+        unpauseSound();
         goToGame();
     }
     if ((!(~(oldButtons) & ((1 << 0))) && (~buttons & ((1 << 0)))))
     {
+        stopSound();
         goToStart();
     }
 }
@@ -407,6 +452,7 @@ void game()
         if (itemsCollected >= 5)
         {
             (*(volatile unsigned short *)0x04000010) = 0;
+            stopSound();
             goToWin();
         }
 
@@ -414,6 +460,7 @@ void game()
         {
             (*(volatile unsigned short *)0x04000010) = 0;
             (*(volatile unsigned short *)0x04000014) = 0;
+            stopSound();
             goToLoseItems();
         }
     }
@@ -423,6 +470,7 @@ void game()
     {
         (*(volatile unsigned short *)0x04000010) = 0;
         (*(volatile unsigned short *)0x04000014) = 0;
+        stopSound();
         goToLose();
     }
 
@@ -434,6 +482,7 @@ void game()
 
     if ((!(~(oldButtons) & ((1 << 3))) && (~buttons & ((1 << 3)))))
     {
+        pauseSound();
         goToPause();
     }
 

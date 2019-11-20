@@ -79,6 +79,18 @@ void DMANow(int channel, volatile const void *src, volatile void *dst, unsigned 
 
 
 int collision(int colA, int rowA, int widthA, int heightA, int colB, int rowB, int widthB, int heightB);
+# 328 "myLib.h"
+typedef struct
+{
+    const unsigned char *data;
+    int length;
+    int frequency;
+    int isPlaying;
+    int loops;
+    int duration;
+    int priority;
+    int vBlankCount;
+} SOUND;
 # 2 "game.c" 2
 # 1 "spritesheet.h" 1
 # 21 "spritesheet.h"
