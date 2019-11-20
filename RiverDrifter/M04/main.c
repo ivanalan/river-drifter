@@ -35,6 +35,9 @@ HOW TO PLAY?
 #include "topsky.h"
 #include "lose.h"
 #include "win.h"
+#include "sound.h"
+#include "moonRiver.h"
+#include "TitleSong.h"
 #include "loseItems.h"
 #include "instructions.h"
 #include "spritesheet.h"
@@ -125,6 +128,8 @@ int main()
 
 void initialize()
 {
+    setupSounds();
+    setupInterrupts();
 
     goToStart();
 
@@ -132,6 +137,9 @@ void initialize()
 }
 void goToStart()
 {
+    //play title song
+    stopSound();
+    playSoundA(TitleSong, TITLESONGLEN, TITLESONGFREQ, 1);
 
     //init, restart game
     initGame();
@@ -157,11 +165,14 @@ void start()
     {
         goToGame();
         srand(seed);
+        stopSound();
+        playSoundA(moonRiver, MOONRIVERLEN, MOONRIVERFREQ, 1);
     }
 
     //instructions screen
     if (BUTTON_PRESSED(BUTTON_A))
     {
+        stopSound();
         goToInstruct();
     }
 }
@@ -225,10 +236,12 @@ void pause()
 
     if (BUTTON_PRESSED(BUTTON_START))
     {
+        unpauseSound();
         goToGame();
     }
     if (BUTTON_PRESSED(BUTTON_A))
     {
+        stopSound();
         goToStart();
     }
 }
@@ -267,6 +280,7 @@ void game()
         if (itemsCollected >= 5)
         {
             REG_BG0HOFF = 0;
+            stopSound();
             goToWin();
         }
         //not enough items lose condition
@@ -274,6 +288,7 @@ void game()
         {
             REG_BG0HOFF = 0;
             REG_BG1HOFF = 0;
+            stopSound();
             goToLoseItems();
         }
     }
@@ -283,6 +298,7 @@ void game()
     {
         REG_BG0HOFF = 0;
         REG_BG1HOFF = 0;
+        stopSound();
         goToLose();
     }
 
@@ -294,6 +310,7 @@ void game()
     //pause condition
     if (BUTTON_PRESSED(BUTTON_START))
     {
+        pauseSound();
         goToPause();
     }
 
