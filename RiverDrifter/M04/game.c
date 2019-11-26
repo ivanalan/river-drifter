@@ -1,4 +1,6 @@
 #include "myLib.h"
+#include "powerDown.h"
+#include "sound.h"
 #include "spritesheet.h"
 #include <stdlib.h>
 
@@ -62,6 +64,7 @@ typedef struct
 typedef struct
 {
     int row;
+    int aniState;
     int col;
     int rdel;
     int cdel;
@@ -93,6 +96,7 @@ void drawGame();
 void initPlayer();
 void updatePlayer();
 void drawPlayer();
+void animatePlayer();
 
 //items
 extern int itemsCollected;
@@ -103,7 +107,7 @@ void updateItems(int item);
 void initClothes();
 void updateClothes();
 CLOTHING findRandClothing();
-#define CLOTHINGCOUNT 5
+#define CLOTHINGCOUNT 4
 
 //lives
 extern int livesremaining;
@@ -162,12 +166,12 @@ void initItems()
     //"Items: "
     shadowOAM[6].attr0 = 4 | ATTR0_WIDE;
     shadowOAM[6].attr1 = 180 | ATTR1_SMALL;
-    shadowOAM[6].attr2 = ATTR2_TILEID(0, 3);
+    shadowOAM[6].attr2 = ATTR2_TILEID(0, 8);
 
     //intial "0"
     shadowOAM[7].attr0 = 4 | ATTR0_SQUARE;
     shadowOAM[7].attr1 = 215 | ATTR1_TINY;
-    shadowOAM[7].attr2 = ATTR2_TILEID(9, 4);
+    shadowOAM[7].attr2 = ATTR2_TILEID(9, 9);
 }
 
 void initClothes()
@@ -198,12 +202,12 @@ void initLives()
     //"lives: "
     shadowOAM[4].attr0 = 4 | ATTR0_WIDE;
     shadowOAM[4].attr1 = 2 | ATTR1_SMALL;
-    shadowOAM[4].attr2 = ATTR2_TILEID(0, 2);
+    shadowOAM[4].attr2 = ATTR2_TILEID(0, 7);
 
     //intial "3"
     shadowOAM[5].attr0 = 4 | ATTR0_SQUARE;
     shadowOAM[5].attr1 = 8 | ATTR1_TINY;
-    shadowOAM[5].attr2 = ATTR2_TILEID(2, 4);
+    shadowOAM[5].attr2 = ATTR2_TILEID(2, 9);
 }
 void initTwig()
 {
@@ -230,12 +234,13 @@ void initPlayer()
     player.row = SCREENHEIGHT / 2;
     player.col = (SCREENWIDTH / 2) - 70;
     player.rdel = 1;
+    player.aniState = 0;
     player.width = 16;
     player.height = 8;
     player.distanceTraveled = 0;
     shadowOAM[0].attr0 = 0 | ATTR0_WIDE;
     shadowOAM[0].attr1 = 0 | ATTR1_TINY;
-    shadowOAM[0].attr2 = ATTR2_TILEID(0, 0);
+    shadowOAM[0].attr2 = ATTR2_TILEID(0, player.aniState);
 }
 
 void initBullets()
@@ -259,6 +264,10 @@ void initBullets()
 
 void updateGame()
 {
+    if (time % 20 == 0)
+    {
+        animatePlayer();
+    }
     updatePlayer();
     updateTwig();
     updateBullets();
@@ -273,12 +282,12 @@ void updateTimeline()
     //text: "River Progress"
     shadowOAM[21].attr0 = 3 | ATTR0_WIDE;
     shadowOAM[21].attr1 = 93 | ATTR1_LARGE;
-    shadowOAM[21].attr2 = ATTR2_TILEID(0, 5);
+    shadowOAM[21].attr2 = ATTR2_TILEID(0, 10);
 
     int speed = 20;
     //update player distance icon
     shadowOAM[3].attr0 = 13 | ATTR0_WIDE;
-    shadowOAM[3].attr1 = 74 + (player.distanceTraveled / speed) | ATTR1_TINY;
+    shadowOAM[3].attr1 = (74 + (player.distanceTraveled / speed)) | ATTR1_TINY;
     shadowOAM[3].attr2 = ATTR2_TILEID(13, 0);
 
     int interval = 70;
@@ -346,7 +355,7 @@ void updateClothes()
             shadowOAM[i + 70].attr1 = clothes[i].col | ATTR1_TINY;
         }
     }
-    if (time % 257 == 0)
+    if (time % 187 == 0)
     {
         CLOTHING rand = findRandClothing();
         clothes[rand.id].row = rand.initRow;
@@ -375,25 +384,25 @@ void updateLives(int lives)
     {
         shadowOAM[5].attr0 = 4 | ATTR0_SQUARE;
         shadowOAM[5].attr1 = 35 | ATTR1_TINY;
-        shadowOAM[5].attr2 = ATTR2_TILEID(1, 4);
+        shadowOAM[5].attr2 = ATTR2_TILEID(1, 9);
     }
     else if (lives == 1)
     {
         shadowOAM[5].attr0 = 4 | ATTR0_SQUARE;
         shadowOAM[5].attr1 = 35 | ATTR1_TINY;
-        shadowOAM[5].attr2 = ATTR2_TILEID(0, 4);
+        shadowOAM[5].attr2 = ATTR2_TILEID(0, 9);
     }
     else
     {
         shadowOAM[5].attr0 = 4 | ATTR0_SQUARE;
         shadowOAM[5].attr1 = 35 | ATTR1_TINY;
-        shadowOAM[5].attr2 = ATTR2_TILEID(2, 4);
+        shadowOAM[5].attr2 = ATTR2_TILEID(2, 9);
     }
 
     //update lives
     shadowOAM[4].attr0 = 4 | ATTR0_WIDE;
     shadowOAM[4].attr1 = 2 | ATTR1_SMALL;
-    shadowOAM[4].attr2 = ATTR2_TILEID(0, 2);
+    shadowOAM[4].attr2 = ATTR2_TILEID(0, 7);
 }
 
 void updateItems(int items)
@@ -403,32 +412,32 @@ void updateItems(int items)
         //left digit: '1'
         shadowOAM[7].attr0 = 4 | ATTR0_SQUARE;
         shadowOAM[7].attr1 = 215 | ATTR1_TINY;
-        shadowOAM[7].attr2 = ATTR2_TILEID((items / 10) - 1, 4);
+        shadowOAM[7].attr2 = ATTR2_TILEID((items / 10) - 1, 9);
 
         //right digit:
         shadowOAM[8].attr0 = 4 | ATTR0_SQUARE;
         shadowOAM[8].attr1 = 222 | ATTR1_TINY;
-        shadowOAM[8].attr2 = ATTR2_TILEID((items - 1) % 10, 4);
+        shadowOAM[8].attr2 = ATTR2_TILEID((items - 1) % 10, 9);
     }
     else if (items > 0)
     {
         //update number
         shadowOAM[7].attr0 = 4 | ATTR0_SQUARE;
         shadowOAM[7].attr1 = 215 | ATTR1_TINY;
-        shadowOAM[7].attr2 = ATTR2_TILEID(items - 1, 4);
+        shadowOAM[7].attr2 = ATTR2_TILEID(items - 1, 9);
     }
     else
     {
         //intial "0"
         shadowOAM[7].attr0 = 4 | ATTR0_SQUARE;
         shadowOAM[7].attr1 = 215 | ATTR1_TINY;
-        shadowOAM[7].attr2 = ATTR2_TILEID(9, 4);
+        shadowOAM[7].attr2 = ATTR2_TILEID(9, 9);
     }
 
     //update "Items: "
     shadowOAM[6].attr0 = 4 | ATTR0_WIDE;
     shadowOAM[6].attr1 = 182 | ATTR1_SMALL;
-    shadowOAM[6].attr2 = ATTR2_TILEID(0, 3);
+    shadowOAM[6].attr2 = ATTR2_TILEID(0, 8);
 }
 
 void updatePlayer()
@@ -457,6 +466,7 @@ void updatePlayer()
 
     shadowOAM[0].attr0 = player.row | ATTR0_WIDE;
     shadowOAM[0].attr1 = player.col | ATTR1_TINY;
+    shadowOAM[0].attr2 = ATTR2_TILEID(0, player.aniState);
 
     REG_BG0HOFF = hOff;
     REG_BG1HOFF = hOff / 20;
@@ -471,6 +481,7 @@ void updateTwig()
             //decrease lives if collision with twig
             if (!cheat && collision(twig[i].col, twig[i].row, twig[i].width, twig[i].height, player.col, player.row, player.width, player.height))
             {
+                playSoundB(powerDown, POWERDOWNLEN, POWERDOWNFREQ, 0);
                 livesremaining = livesremaining - 1;
                 twig[i].active = 0;
                 twig[i].row = 10;
@@ -573,5 +584,24 @@ void updateBullets()
             bullets[i].distTraveled = 0;
             shadowOAM[i + 30].attr0 = ATTR0_HIDE | ATTR0_SQUARE;
         }
+    }
+}
+
+void animatePlayer()
+{
+    switch (player.aniState)
+    {
+    case 0:
+        player.aniState = 1;
+        break;
+    case 1:
+        player.aniState = 2;
+        break;
+    case 2:
+        player.aniState = 3;
+        break;
+    case 3:
+        player.aniState = 0;
+        break;
     }
 }

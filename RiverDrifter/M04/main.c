@@ -6,12 +6,15 @@ WHAT IS FINISHED WITH M04?
 - Update Instructions Page
 - Update Pause Page
 - Update Splash Screen
+- Added Splash Screen music that loops
+- Aded Game play screen music
+- Added sound effect when player hits branch
+- Animated player so that they're paddling
+
 
 WHAT NEEDS TO BE ADDED?
 - Make cheat change player color
-- Actual Graphics for sprites
-- Animation
-- Sound
+
 
 BUGS?
 - None I am aware of so far
