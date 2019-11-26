@@ -92,13 +92,32 @@ typedef struct
     int vBlankCount;
 } SOUND;
 # 2 "game.c" 2
+# 1 "powerDown.h" 1
+# 20 "powerDown.h"
+extern const unsigned char powerDown[20513];
+# 3 "game.c" 2
+# 1 "sound.h" 1
+SOUND soundA;
+SOUND soundB;
+
+void setupSounds();
+void playSoundA( const unsigned char* sound, int length, int frequency, int loops);
+void playSoundB( const unsigned char* sound, int length, int frequency, int loops);
+
+void setupInterrupts();
+void interruptHandler();
+
+void pauseSound();
+void unpauseSound();
+void stopSound();
+# 4 "game.c" 2
 # 1 "spritesheet.h" 1
 # 21 "spritesheet.h"
 extern const unsigned short spritesheetTiles[16384];
 
 
 extern const unsigned short spritesheetPal[256];
-# 3 "game.c" 2
+# 5 "game.c" 2
 # 1 "c:\\devkitpro\\devkitarm\\arm-none-eabi\\include\\stdlib.h" 1 3
 # 10 "c:\\devkitpro\\devkitarm\\arm-none-eabi\\include\\stdlib.h" 3
 # 1 "c:\\devkitpro\\devkitarm\\arm-none-eabi\\include\\machine\\ieeefp.h" 1 3
@@ -907,10 +926,10 @@ extern long double _strtold_r (struct _reent *, const char *restrict, char **res
 extern long double strtold (const char *restrict, char **restrict);
 # 336 "c:\\devkitpro\\devkitarm\\arm-none-eabi\\include\\stdlib.h" 3
 
-# 4 "game.c" 2
-# 30 "game.c"
+# 6 "game.c" 2
+# 32 "game.c"
 
-# 30 "game.c"
+# 32 "game.c"
 enum
 {
     SHIRT,
@@ -946,6 +965,7 @@ typedef struct
 typedef struct
 {
     int row;
+    int aniState;
     int col;
     int rdel;
     int cdel;
@@ -977,6 +997,7 @@ void drawGame();
 void initPlayer();
 void updatePlayer();
 void drawPlayer();
+void animatePlayer();
 
 
 extern int itemsCollected;
@@ -1013,7 +1034,7 @@ void updateTimeline();
 PLAYER player;
 ENEMY twig[10];
 BULLET bullets[1];
-CLOTHING clothes[5];
+CLOTHING clothes[4];
 
 
 OBJ_ATTR shadowOAM[128];
@@ -1046,12 +1067,12 @@ void initItems()
 
     shadowOAM[6].attr0 = 4 | (1 << 14);
     shadowOAM[6].attr1 = 180 | (1 << 14);
-    shadowOAM[6].attr2 = ((3)*32 + (0));
+    shadowOAM[6].attr2 = ((8)*32 + (0));
 
 
     shadowOAM[7].attr0 = 4 | (0 << 14);
     shadowOAM[7].attr1 = 215 | (0 << 14);
-    shadowOAM[7].attr2 = ((4)*32 + (9));
+    shadowOAM[7].attr2 = ((9)*32 + (9));
 }
 
 void initClothes()
@@ -1062,7 +1083,7 @@ void initClothes()
 
 
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 4; i++)
     {
         clothes[i].id = i;
         clothes[i].initRow = (8 * (i % 10)) + 81;
@@ -1082,12 +1103,12 @@ void initLives()
 
     shadowOAM[4].attr0 = 4 | (1 << 14);
     shadowOAM[4].attr1 = 2 | (1 << 14);
-    shadowOAM[4].attr2 = ((2)*32 + (0));
+    shadowOAM[4].attr2 = ((7)*32 + (0));
 
 
     shadowOAM[5].attr0 = 4 | (0 << 14);
     shadowOAM[5].attr1 = 8 | (0 << 14);
-    shadowOAM[5].attr2 = ((4)*32 + (2));
+    shadowOAM[5].attr2 = ((9)*32 + (2));
 }
 void initTwig()
 {
@@ -1114,12 +1135,13 @@ void initPlayer()
     player.row = 160 / 2;
     player.col = (240 / 2) - 70;
     player.rdel = 1;
+    player.aniState = 0;
     player.width = 16;
     player.height = 8;
     player.distanceTraveled = 0;
     shadowOAM[0].attr0 = 0 | (1 << 14);
     shadowOAM[0].attr1 = 0 | (0 << 14);
-    shadowOAM[0].attr2 = ((0)*32 + (0));
+    shadowOAM[0].attr2 = ((player.aniState)*32 + (0));
 }
 
 void initBullets()
@@ -1143,6 +1165,10 @@ void initBullets()
 
 void updateGame()
 {
+    if (time % 20 == 0)
+    {
+        animatePlayer();
+    }
     updatePlayer();
     updateTwig();
     updateBullets();
@@ -1157,12 +1183,12 @@ void updateTimeline()
 
     shadowOAM[21].attr0 = 3 | (1 << 14);
     shadowOAM[21].attr1 = 93 | (3 << 14);
-    shadowOAM[21].attr2 = ((5)*32 + (0));
+    shadowOAM[21].attr2 = ((10)*32 + (0));
 
     int speed = 20;
 
     shadowOAM[3].attr0 = 13 | (1 << 14);
-    shadowOAM[3].attr1 = 74 + (player.distanceTraveled / speed) | (0 << 14);
+    shadowOAM[3].attr1 = (74 + (player.distanceTraveled / speed)) | (0 << 14);
     shadowOAM[3].attr2 = ((0)*32 + (13));
 
     int interval = 70;
@@ -1200,7 +1226,7 @@ void updateClothes()
 
 
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 4; i++)
     {
         if (clothes[i].active == 1)
         {
@@ -1230,7 +1256,7 @@ void updateClothes()
             shadowOAM[i + 70].attr1 = clothes[i].col | (0 << 14);
         }
     }
-    if (time % 257 == 0)
+    if (time % 187 == 0)
     {
         CLOTHING rand = findRandClothing();
         clothes[rand.id].row = rand.initRow;
@@ -1240,9 +1266,9 @@ void updateClothes()
 }
 CLOTHING findRandClothing()
 {
-    CLOTHING rands[5];
+    CLOTHING rands[4];
     int count = 0;
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 4; i++)
     {
         if (clothes[i].active == 0)
         {
@@ -1259,25 +1285,25 @@ void updateLives(int lives)
     {
         shadowOAM[5].attr0 = 4 | (0 << 14);
         shadowOAM[5].attr1 = 35 | (0 << 14);
-        shadowOAM[5].attr2 = ((4)*32 + (1));
+        shadowOAM[5].attr2 = ((9)*32 + (1));
     }
     else if (lives == 1)
     {
         shadowOAM[5].attr0 = 4 | (0 << 14);
         shadowOAM[5].attr1 = 35 | (0 << 14);
-        shadowOAM[5].attr2 = ((4)*32 + (0));
+        shadowOAM[5].attr2 = ((9)*32 + (0));
     }
     else
     {
         shadowOAM[5].attr0 = 4 | (0 << 14);
         shadowOAM[5].attr1 = 35 | (0 << 14);
-        shadowOAM[5].attr2 = ((4)*32 + (2));
+        shadowOAM[5].attr2 = ((9)*32 + (2));
     }
 
 
     shadowOAM[4].attr0 = 4 | (1 << 14);
     shadowOAM[4].attr1 = 2 | (1 << 14);
-    shadowOAM[4].attr2 = ((2)*32 + (0));
+    shadowOAM[4].attr2 = ((7)*32 + (0));
 }
 
 void updateItems(int items)
@@ -1287,32 +1313,32 @@ void updateItems(int items)
 
         shadowOAM[7].attr0 = 4 | (0 << 14);
         shadowOAM[7].attr1 = 215 | (0 << 14);
-        shadowOAM[7].attr2 = ((4)*32 + ((items / 10) - 1));
+        shadowOAM[7].attr2 = ((9)*32 + ((items / 10) - 1));
 
 
         shadowOAM[8].attr0 = 4 | (0 << 14);
         shadowOAM[8].attr1 = 222 | (0 << 14);
-        shadowOAM[8].attr2 = ((4)*32 + ((items - 1) % 10));
+        shadowOAM[8].attr2 = ((9)*32 + ((items - 1) % 10));
     }
     else if (items > 0)
     {
 
         shadowOAM[7].attr0 = 4 | (0 << 14);
         shadowOAM[7].attr1 = 215 | (0 << 14);
-        shadowOAM[7].attr2 = ((4)*32 + (items - 1));
+        shadowOAM[7].attr2 = ((9)*32 + (items - 1));
     }
     else
     {
 
         shadowOAM[7].attr0 = 4 | (0 << 14);
         shadowOAM[7].attr1 = 215 | (0 << 14);
-        shadowOAM[7].attr2 = ((4)*32 + (9));
+        shadowOAM[7].attr2 = ((9)*32 + (9));
     }
 
 
     shadowOAM[6].attr0 = 4 | (1 << 14);
     shadowOAM[6].attr1 = 182 | (1 << 14);
-    shadowOAM[6].attr2 = ((3)*32 + (0));
+    shadowOAM[6].attr2 = ((8)*32 + (0));
 }
 
 void updatePlayer()
@@ -1341,6 +1367,7 @@ void updatePlayer()
 
     shadowOAM[0].attr0 = player.row | (1 << 14);
     shadowOAM[0].attr1 = player.col | (0 << 14);
+    shadowOAM[0].attr2 = ((player.aniState)*32 + (0));
 
     (*(volatile unsigned short *)0x04000010) = hOff;
     (*(volatile unsigned short *)0x04000014) = hOff / 20;
@@ -1355,6 +1382,7 @@ void updateTwig()
 
             if (!cheat && collision(twig[i].col, twig[i].row, twig[i].width, twig[i].height, player.col, player.row, player.width, player.height))
             {
+                playSoundB(powerDown, 20513, 11025, 0);
                 livesremaining = livesremaining - 1;
                 twig[i].active = 0;
                 twig[i].row = 10;
@@ -1457,5 +1485,24 @@ void updateBullets()
             bullets[i].distTraveled = 0;
             shadowOAM[i + 30].attr0 = (2 << 8) | (0 << 14);
         }
+    }
+}
+
+void animatePlayer()
+{
+    switch (player.aniState)
+    {
+    case 0:
+        player.aniState = 1;
+        break;
+    case 1:
+        player.aniState = 2;
+        break;
+    case 2:
+        player.aniState = 3;
+        break;
+    case 3:
+        player.aniState = 0;
+        break;
     }
 }
