@@ -775,7 +775,7 @@ goToChoosePlayer:
 	mov	lr, pc
 	bx	r4
 	mov	r2, #4096
-	mov	r3, #784
+	mov	r3, #1104
 	strh	r2, [r5, #8]	@ movhi
 	mov	r0, #3
 	mov	r2, #100663296
@@ -893,20 +893,13 @@ start:
 	bx	lr
 .L107:
 	bl	goToChoosePlayer
-	ldr	r0, [r4]
 	ldr	r3, .L109+24
+	ldr	r0, [r4]
 	mov	lr, pc
 	bx	r3
 	ldr	r3, .L109+12
 	mov	lr, pc
 	bx	r3
-	ldr	r4, .L109+28
-	ldr	r2, .L109+32
-	mov	r3, #1
-	ldr	r1, .L109+36
-	ldr	r0, .L109+40
-	mov	lr, pc
-	bx	r4
 	ldrh	r2, [r5]
 	b	.L98
 .L110:
@@ -919,10 +912,6 @@ start:
 	.word	waitForVBlank
 	.word	state
 	.word	srand
-	.word	playSoundA
-	.word	11025
-	.word	2077344
-	.word	moonRiver
 	.size	start, .-start
 	.align	2
 	.global	choosePlayer
@@ -989,6 +978,13 @@ choosePlayer:
 	str	r1, [ip]
 	b	.L112
 .L127:
+	mov	r3, #1
+	ldr	r2, .L128+24
+	ldr	r1, .L128+28
+	ldr	r0, .L128+32
+	ldr	r4, .L128+36
+	mov	lr, pc
+	bx	r4
 	bl	goToGame
 	b	.L114
 .L129:
@@ -1000,6 +996,10 @@ choosePlayer:
 	.word	drawGame
 	.word	revolver
 	.word	choice
+	.word	11025
+	.word	2077344
+	.word	moonRiver
+	.word	playSoundA
 	.size	choosePlayer, .-choosePlayer
 	.section	.text.startup,"ax",%progbits
 	.align	2

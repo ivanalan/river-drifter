@@ -1,20 +1,13 @@
 /*
 River Drifter - GAME INFO
 
-WHAT IS FINISHED WITH M04?
-- Fixed bug on pause screen hoff
-- Update Instructions Page
-- Update Pause Page
-- Update Splash Screen
-- Added Splash Screen music that loops
-- Aded Game play screen music
-- Added sound effect when player hits branch
-- Animated player so that they're paddling
+WHAT IS FINISHED since M04?
+- make cheat change player color
+- Add ability to change player color
 
 
 WHAT NEEDS TO BE ADDED?
-- Make cheat change player color
-
+- 
 
 BUGS?
 - None I am aware of so far
@@ -184,7 +177,6 @@ void start()
         goToChoosePlayer();
         srand(seed);
         stopSound();
-        playSoundA(moonRiver, MOONRIVERLEN, MOONRIVERFREQ, 1);
     }
 
     //instructions screen
@@ -283,7 +275,6 @@ void goToGame()
     DMANow(3, spritesheetTiles, &CHARBLOCK[4], spritesheetTilesLen / 2);
 
     REG_DISPCTL = MODE0 | BG0_ENABLE | BG1_ENABLE | SPRITE_ENABLE;
-
     state = GAME;
 }
 
@@ -422,6 +413,7 @@ void choosePlayer()
 
     if (BUTTON_PRESSED(BUTTON_START))
     {
+        playSoundA(moonRiver, MOONRIVERLEN, MOONRIVERFREQ, 1);
         goToGame();
     }
 

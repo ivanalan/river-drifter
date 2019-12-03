@@ -111,13 +111,17 @@ void pauseSound();
 void unpauseSound();
 void stopSound();
 # 4 "game.c" 2
+# 1 "up.h" 1
+# 20 "up.h"
+extern const unsigned char up[11054];
+# 5 "game.c" 2
 # 1 "spritesheet.h" 1
 # 21 "spritesheet.h"
 extern const unsigned short spritesheetTiles[16384];
 
 
 extern const unsigned short spritesheetPal[256];
-# 5 "game.c" 2
+# 6 "game.c" 2
 # 1 "c:\\devkitpro\\devkitarm\\arm-none-eabi\\include\\stdlib.h" 1 3
 # 10 "c:\\devkitpro\\devkitarm\\arm-none-eabi\\include\\stdlib.h" 3
 # 1 "c:\\devkitpro\\devkitarm\\arm-none-eabi\\include\\machine\\ieeefp.h" 1 3
@@ -926,10 +930,10 @@ extern long double _strtold_r (struct _reent *, const char *restrict, char **res
 extern long double strtold (const char *restrict, char **restrict);
 # 336 "c:\\devkitpro\\devkitarm\\arm-none-eabi\\include\\stdlib.h" 3
 
-# 6 "game.c" 2
-# 34 "game.c"
+# 7 "game.c" 2
+# 35 "game.c"
 
-# 34 "game.c"
+# 35 "game.c"
 enum
 {
     SHIRT,
@@ -1243,6 +1247,7 @@ void updateClothes()
 
             if (collision(player.col, player.row, player.width, player.height, clothes[i].col, clothes[i].row, clothes[i].width, clothes[i].height))
             {
+                playSoundB(up, 11054, 11025, 0);
                 itemsCollected++;
                 clothes[i].active = 0;
                 clothes[i].row = 10;
@@ -1543,7 +1548,7 @@ void displayPlayer()
         break;
     }
 
-    shadowOAM[80].attr0 = 50 | (1 << 14);
-    shadowOAM[80].attr1 = 90 | (0 << 14);
+    shadowOAM[80].attr0 = 88 | (1 << 14);
+    shadowOAM[80].attr1 = 106 | (0 << 14);
     shadowOAM[80].attr2 = ((0)*32 + (player.id));
 }

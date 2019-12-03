@@ -527,8 +527,8 @@ updateClothes:
 	ldr	r5, .L69+4
 	ldr	r9, .L69+8
 	ldr	r8, .L69+12
-	ldr	fp, .L69+16
-	ldr	r10, .L69+20
+	ldr	r10, .L69+16
+	ldr	fp, .L69+20
 	sub	sp, sp, #52
 	add	r6, r7, #128
 .L61:
@@ -565,7 +565,7 @@ updateClothes:
 	ldr	r1, [r8, #4]
 	ldr	r0, [r8, #12]
 	mov	lr, pc
-	bx	fp
+	bx	r10
 	cmp	r0, #0
 	bne	.L68
 	ldr	r3, [r9]
@@ -589,17 +589,24 @@ updateClothes:
 	strh	r2, [r5]	@ movhi
 	b	.L55
 .L68:
+	mov	r3, #0
+	ldr	r2, .L69+32
+	ldr	r1, .L69+36
+	ldr	r0, .L69+40
+	ldr	ip, .L69+44
+	mov	lr, pc
+	bx	ip
 	mov	r3, #250
-	ldr	r2, [r10]
-	add	r2, r2, #1
-	str	r2, [r10]
-	ldr	r2, [r9]
-	tst	r2, #1
+	ldr	lr, [r9]
+	tst	lr, #1
 	str	r3, [r4, #12]
 	mov	ip, #0
 	mov	r0, #10
 	mov	r1, #512
 	moveq	r3, #248
+	ldr	r2, [fp]
+	add	r2, r2, #1
+	str	r2, [fp]
 	str	ip, [r4, #24]
 	str	r0, [r4, #4]
 	strh	r1, [r5]	@ movhi
@@ -635,6 +642,10 @@ updateClothes:
 	.word	itemsCollected
 	.word	11483869
 	.word	-1584774029
+	.word	11025
+	.word	11054
+	.word	up
+	.word	playSoundB
 	.size	updateClothes, .-updateClothes
 	.align	2
 	.global	updateLives
@@ -1397,7 +1408,7 @@ displayPlayer:
 	ldr	r2, .L180+4
 	str	r3, [r2]
 .L179:
-	mov	r1, #90
+	mov	r1, #106
 	ldr	r3, .L180+8
 	ldr	r2, .L180+12
 	strh	r1, [r3, #2]	@ movhi
@@ -1432,7 +1443,7 @@ displayPlayer:
 	.word	choice
 	.word	player
 	.word	shadowOAM+640
-	.word	16434
+	.word	16472
 	.size	displayPlayer, .-displayPlayer
 	.comm	hOff,2,2
 	.global	cheat

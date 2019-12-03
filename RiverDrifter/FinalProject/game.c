@@ -1,6 +1,7 @@
 #include "myLib.h"
 #include "powerDown.h"
 #include "sound.h"
+#include "up.h"
 #include "spritesheet.h"
 #include <stdlib.h>
 
@@ -344,6 +345,7 @@ void updateClothes()
             //if player collects item
             if (collision(player.col, player.row, player.width, player.height, clothes[i].col, clothes[i].row, clothes[i].width, clothes[i].height))
             {
+                playSoundB(up, UPLEN, UPFREQ, 0);
                 itemsCollected++;
                 clothes[i].active = 0;
                 clothes[i].row = 10;
@@ -644,7 +646,7 @@ void displayPlayer()
         break;
     }
 
-    shadowOAM[80].attr0 = 50 | ATTR0_WIDE;
-    shadowOAM[80].attr1 = 90 | ATTR1_TINY;
+    shadowOAM[80].attr0 = 88 | ATTR0_WIDE;
+    shadowOAM[80].attr1 = 106 | ATTR1_TINY;
     shadowOAM[80].attr2 = ATTR2_TILEID(player.id, 0);
 }
